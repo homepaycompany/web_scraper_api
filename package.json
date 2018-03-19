@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "leboncoin-api": "^0.0.16"
+  }
+}
