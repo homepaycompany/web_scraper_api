@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180319164804) do
+ActiveRecord::Schema.define(version: 20180320153258) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(version: 20180319164804) do
     t.date "posted_on"
     t.date "updated_on"
     t.date "removed_on"
-    t.string "address"
+    t.string "location"
     t.string "property_type"
     t.integer "num_floors"
     t.integer "num_rooms"
@@ -51,6 +51,8 @@ ActiveRecord::Schema.define(version: 20180319164804) do
     t.string "email"
     t.string "all_prices"
     t.string "all_updates"
+    t.string "urls"
+    t.string "status"
   end
 
 end
