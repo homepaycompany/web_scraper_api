@@ -122,19 +122,17 @@ class Scrapers::ScraperLbc
   def get_listings_urls_and_prices(html_doc)
     listing_urls_and_prices = {}
     html_doc.search(@listing_class).each do |l|
-      listing_urls_and_prices["https:#{l.attribute('href').value}"] = l.search('h3').attribute('content').value
+      listing_urls_and_prices["https:#{l.attribute('href').value}"] = l.search('h3').attribute('content').value.to_i
     end
     return listing_urls_and_prices
   end
 
   def get_listing_html(url)
-    p 'hello from get_listing_html ---------------------'
     listing_html_file = open(url).read
     listing_html_doc = Nokogiri::HTML(listing_html_file)
   end
 
   def extract_listing_information(html_doc)
-    p 'hello from extract_listing_info ---------------------'
     listing = {}
     begin
       listing[:name] = html_doc.search('h1').first.text
@@ -142,7 +140,7 @@ class Scrapers::ScraperLbc
       p 'Error - no title'
     end
     begin
-      listing[:price] = html_doc.search('div[data-qa-id="adview_price"]').first.text.match(/([\d+\s*]+\d)/)[1].gsub(/\s/, "")
+      listing[:price] = html_doc.search('div[data-qa-id="adview_price"]').first.text.match(/([\d+\s*]+\d)/)[1].gsub(/\s/, "").to_i
     rescue
       p 'Error - no price'
     end
@@ -152,7 +150,16 @@ class Scrapers::ScraperLbc
       p 'Error - no postage date'
     end
     begin
-      listing[:property_type] = html_doc.search('div[data-qa-id="criteria_item_real_estate_type"]').first.children.last.text
+      property_type = html_doc.search('div[data-qa-id="criteria_item_real_estate_type"]').first.children.last.text
+      if property_type.match(/maison/i)
+        listing[:property_type] = 'house'
+      elsif property_type.match(/appartement/i)
+        listing[:property_type] = 'appartment'
+      elsif property_type.match(/terrain/i)
+        listing[:property_type] = 'terrain'
+      elsif property_type.match(/immeuble/i)
+        listing[:property_type] = 'building'
+      end
     rescue
       p 'Error - no property type'
     end

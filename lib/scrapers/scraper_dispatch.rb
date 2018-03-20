@@ -22,7 +22,6 @@ class Scrapers::ScraperDispatch
   end
 
   def scrap_one_listing(url)
-    p 'hello from scrap_one_listing ---------------------'
     case @website
     when 'lbc'
       scraper = Scrapers::ScraperLbc.new

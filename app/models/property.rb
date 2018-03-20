@@ -27,16 +27,8 @@ class Property < ApplicationRecord
         n << {url: k}
       end
     end
-    return {new: n, updated: u, closed: c}
+    return {new: n, updated: u, closed: c.map { |i| { id: i } } }
   end
-
-  # Gets a listing and check wether it already exists in DB by performing checks on its price,
-  # location and description, and if not then saves it in DB
-  # def save_new_listing
-  #   Property.where(location: self.location)
-  # end
-
-  private
 
   def self.listings_open_urls_prices_and_ids
     a = {}
@@ -54,5 +46,29 @@ class Property < ApplicationRecord
     else
       return [self.urls]
     end
+  end
+
+  # Perform check on a new listing : if already in DB then store the URL, if not then create a new Property
+  def self.save_new_listing(options = {})
+    unless options[:price] && options[:location] && options [:property_type]
+      if self.check_for_duplicate(options)
+        p = self.check_for_duplicate(options)
+        p.urls += ",#{options[:url]}"
+        p.save
+      else
+        Property.create(options.merge({all_prices: options[:price], all_updates: options[:posted_on]}))
+      end
+    end
+  end
+
+  private
+
+  # Gets a listing and check wether it already exists in DB by performing checks on its price,
+  # location and description, and if not then saves it in DB
+  def self.check_for_duplicate(options = {})
+    listings = self.where(location: options[:location])
+      .select { |p|
+        p.price == options[:price] &&
+        p.property_type == options[:property_type] }
   end
 end
