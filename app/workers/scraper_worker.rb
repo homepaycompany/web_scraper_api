@@ -52,6 +52,12 @@ class ScraperWorker
         end
       end
     end
+
+    # TEST SECTION
+    # p = Property.last.attributes
+    # p p['id']
+    # p['description'] = "A vendre mai environ 130 m² le chat est beau à la campagne sur un terrain une cuisine aménagée et équipée, 3 grandes chambres dont une de 20 partir d'ici le matin camion campagne ains wcA l'étage une grande pièce de 25 m² (55 au sol) + grenier aménageableChauffage central bois + fuel"
+    # Property.save_new_listing(p.merge(urls: 'test', status: 'open'))
   end
 
 end

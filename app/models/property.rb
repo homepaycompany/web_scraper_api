@@ -1,4 +1,12 @@
 class Property < ApplicationRecord
+  require 'fuzzy_match'
+  geocoded_by :location
+  after_validation :geocode, if: :will_save_change_to_location?
+  searchkick locations: [:location]
+
+  def search_data
+    attributes.except("id").merge(location: {lat: latitude, lon: longitude})
+  end
   # Gets a hash of listings structured as an url and a price and returns a hash with 3 arrays
   # new: array with hashs of urls to scrap
   # updated: array with hashs of properties to update structured as their ids and prices
@@ -27,7 +35,7 @@ class Property < ApplicationRecord
         n << {url: k}
       end
     end
-    return {new: n, updated: u, closed: c.map { |i| { id: i } } }
+    return { new: n, updated: u, closed: c.map { |i| { id: i } } }
   end
 
   def self.listings_open_urls_prices_and_ids
@@ -50,13 +58,15 @@ class Property < ApplicationRecord
 
   # Perform check on a new listing : if already in DB then store the URL, if not then create a new Property
   def self.save_new_listing(options = {})
-    unless options[:price] && options[:location] && options [:property_type]
-      if self.check_for_duplicate(options)
-        p = self.check_for_duplicate(options)
+    if options['price'] && options['location'] && options ['property_type'] && options ['livable_size_sqm']
+    temp = Property.new(options.merge({all_prices: options['price'], all_updates: options['posted_on']}))
+      p = self.check_for_duplicate(temp)
+      if p
+        temp.destroy
         p.urls += ",#{options[:url]}"
-        p.save
+        p.update(urls: p.urls)
       else
-        Property.create(options.merge({all_prices: options[:price], all_updates: options[:posted_on]}))
+        temp.save
       end
     end
   end
@@ -65,10 +75,32 @@ class Property < ApplicationRecord
 
   # Gets a listing and check wether it already exists in DB by performing checks on its price,
   # location and description, and if not then saves it in DB
-  def self.check_for_duplicate(options = {})
-    listings = self.where(location: options[:location])
-      .select { |p|
-        p.price == options[:price] &&
-        p.property_type == options[:property_type] }
+  def self.check_for_duplicate(property)
+    p 'checking for duplicates'
+    # Get relevant property attributes to be passed as options for the WHERE portion of the search
+     options = {
+      # location: {near: {lat: property.latitude, lon: property.longitude}, within: "20km"},
+      property_type: property.property_type,
+      price: property.price*0.9..property.price*1.1,
+      livable_size_sqm: property.livable_size_sqm*0.9..property.livable_size_sqm*1.1
+     }
+    a = Property.where(options)
+    r = FuzzyMatch.new(a, :read => :description).find(property.description)
+    return r
   end
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

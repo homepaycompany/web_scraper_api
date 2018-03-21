@@ -29,6 +29,18 @@ gem 'puma', '~> 3.7'
 gem 'sidekiq'
 gem 'sidekiq-failures', '~> 1.0'
 
+# Using searchKick for listing matching
+gem 'searchkick', '~> 2.3'
+
+# Using fuzzy match to deduplicate listings based on description
+gem 'fuzzy_match', '~> 2.1'
+
+# Geocoding listings with google geocoder gem
+gem "geocoder"
+
+# using figaro for secrets
+gem 'figaro'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
