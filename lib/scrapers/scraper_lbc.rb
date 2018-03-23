@@ -69,19 +69,7 @@ class Scrapers::ScraperLbc
         }
       },
       page: {
-        query: 'o',
-        scale: {
-          1 => '',
-          2 => 2,
-          3 => 3,
-          4 => 4,
-          5 => 5,
-          6 => 6,
-          7 => 7,
-          8 => 8,
-          9 => 9,
-          10 => 10
-        }
+        query: 'o'
       }
     }
 
@@ -91,19 +79,21 @@ class Scrapers::ScraperLbc
     query = "?"
     options.each do |k, v|
       if k.to_s == "location"
-        query += "&#{@query_params[k][query]}=#{v}"
+        query += "&#{@query_params[k][:query]}=#{v}"
+      elsif k.to_s == 'page'
+        query += "&#{@query_params[k][:query]}=#{v}"
       elsif @query_params[k][:scale][v] != ''
         if k.to_s == 'property_type'
           v.each do |t|
-            query += "&#{@query_params[k][:query]}=#{@query_params[k][:scale][v]}"
+            query += "&#{@query_params[k][:query]}=#{@query_params[k][:scale][t]}"
           end
         else
           query += "&#{@query_params[k][:query]}=#{@query_params[k][:scale][v]}"
         end
       end
     end
-
     url = @base_search_url + query
+    p url
     html_file = open(url).read
     html_doc = Nokogiri::HTML(html_file)
   end
@@ -116,6 +106,7 @@ class Scrapers::ScraperLbc
         pages << a.text.to_i
       end
     end
+    pages.delete(0)
     return pages
   end
 
@@ -184,5 +175,9 @@ class Scrapers::ScraperLbc
       p 'Error - no location'
     end
     return listing
+  end
+
+  def is_add_removed?(html_doc)
+    html_doc.search('h1').first.text == 'Cette annonce est désactivée' ? true : false
   end
 end
