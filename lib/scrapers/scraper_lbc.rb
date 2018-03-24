@@ -178,6 +178,7 @@ class Scrapers::ScraperLbc
   end
 
   def is_add_removed?(html_doc)
+    p html_doc.search('h1').first.text
     html_doc.search('h1').first.text == 'Cette annonce est désactivée' ? true : false
   end
 end

@@ -28,15 +28,17 @@ class ScraperWorker
             p = Property.find(l[:id])
             a = true
             p.urls_array.each do |u|
-              a = a & scrapper.add_is_removed?(u)
+              a = a & scraper.is_add_removed?(u)
             end
             if a
-              all_updates = p.all_updates + ",c-#{p.removed_on}"
+              all_updates = p.all_updates + ",c-#{Time.now.strftime("%d/%m/%Y")}"
               p.update({
                 status: 'closed',
                 removed_on: Time.now.strftime("%d/%m/%Y"),
                 all_updates: all_updates
                 })
+            else
+              p 'Add has not be removed'
             end
           rescue
           p 'Error - listing could not be closed'

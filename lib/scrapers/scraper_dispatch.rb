@@ -27,7 +27,7 @@ class Scrapers::ScraperDispatch
     return listing
   end
 
-  def add_is_removed?(url)
+  def is_add_removed?(url)
     return @scraper.is_add_removed?(@scraper.get_listing_html(url))
   end
 

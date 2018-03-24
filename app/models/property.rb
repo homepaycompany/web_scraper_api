@@ -27,7 +27,7 @@ class Property < ApplicationRecord
 
   def self.listings_open_urls_prices_and_ids(options = {})
     a = {}
-    self.all.select{ |l| l.status != 'closed' && l.location == options[:location] }.each do |l|
+    self.all.select{ |l| l.status != 'closed' }.each do |l|
       l.urls_array.each do |u|
         a[u] = {price: l.price, id: l.id}
       end
@@ -62,6 +62,12 @@ class Property < ApplicationRecord
       else
         temp.save
       end
+    else
+      p 'Creating incomplete property'
+      Property.create(options.merge({
+                                all_prices: options[:price],
+                                all_updates: "c-#{options[:posted_on]}",
+                                status: 'incomplete'}))
     end
   end
 
