@@ -16,7 +16,7 @@ class Property < ApplicationRecord
       if l.keys.include?(k) # Check if the url is already in DB, by looking if its url is already stored
         c.delete(l[k][:id]) # If the listing is already in DB, remove it from the Opened listings array
         if l[k][:price] != v # And check if price has changed, if yes store the listing ID and New Price in the updated listings array
-          u << {id:l[k][:id], price:l[k][:price]}
+          u << { id: l[k][:id], price: v }
         end
       else
         n << {url: k} # If the listing is not already in DB store its url in the new listings array
