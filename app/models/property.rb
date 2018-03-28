@@ -1,7 +1,8 @@
 class Property < ApplicationRecord
   require 'fuzzy_match'
+  require 'amatch'
+  FuzzyMatch.engine = :amatch
   geocoded_by :location
-  after_validation :geocode, if: :will_save_change_to_location?
 
   # Gets a hash of listings structured as an url and a price and returns a hash with 3 arrays
   # new: array with hashs of urls to scrap
@@ -47,18 +48,24 @@ class Property < ApplicationRecord
   def self.save_new_listing(options = {})
     if options[:price] && options[:location] && options [:property_type] && options [:livable_size_sqm]
       temp = Property.new(options.merge({all_prices: options[:price], all_updates: "c-#{options[:posted_on]}"}))
+      temp.geocode
       p = self.check_for_duplicate(temp)
       if p
         p '!! Duplicate found !!'
-        temp.destroy
-        p.urls += ",#{options[:url]}"
-        if p.price != options[:price] || p.status == 'closed'
-          p.price = options[:price]
-          p.status = "updated"
-          p.all_prices += ",#{options[:price]}"
-          p.all_updates += "u-#{options[:posted_on]}"
+        p p
+        p temp
+        unless p.price == temp.price && p.status != 'closed'
+          p 'in loop 1'
+          p.update(
+            urls: p.urls + ",#{temp.urls}",
+            price: temp.price,
+            status: 'updated',
+            all_prices: p.all_prices + ",#{temp.price}",
+            all_updates: p.all_updates + "u-#{temp.posted_on}")
+        else
+          p 'in loop 2'
+          p.update(urls: p.urls + ",#{temp.urls}")
         end
-        p.update(urls: p.urls, price: p.price, status: p.status, all_prices: p.all_prices, all_updates: p.all_updates)
       else
         temp.save
       end
@@ -80,10 +87,18 @@ class Property < ApplicationRecord
     l = Property.near([property.latitude, property.longitude], 10)
     options = {
       property_type: property.property_type,
-      livable_size_sqm: property.livable_size_sqm*0.9..property.livable_size_sqm*1.1
+      livable_size_sqm: (property.livable_size_sqm - 1)..(property.livable_size_sqm + 1),
+      price: property.price*0.8..property.price*1.2
     }
     a = l.where(options)
     r = FuzzyMatch.new(a, :read => :description).find(property.description)
-    return r
+    if r
+      m = Amatch::PairDistance.new("#{r.description}")
+      q = m.match(property.description)
+      if q > 0.95
+        return r
+      end
+    end
+    return nil
   end
 end
