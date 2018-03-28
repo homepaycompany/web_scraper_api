@@ -49,22 +49,28 @@ class Property < ApplicationRecord
     if options[:price] && options[:location] && options [:property_type] && options [:livable_size_sqm]
       temp = Property.new(options.merge({all_prices: options[:price], all_updates: "c-#{options[:posted_on]}"}))
       temp.geocode
-      p = self.check_for_duplicate(temp)
-      if p
+      prop = self.check_for_duplicate(temp)
+      if prop
         p '!! Duplicate found !!'
-        p p
-        p temp
-        unless p.price == temp.price && p.status != 'closed'
-          p 'in loop 1'
-          p.update(
-            urls: p.urls + ",#{temp.urls}",
+        if prop.price != temp.price
+          p 'Price or status updated - updating record'
+          prop.update(
+            urls: prop.urls + ",#{temp.urls}",
             price: temp.price,
             status: 'updated',
-            all_prices: p.all_prices + ",#{temp.price}",
-            all_updates: p.all_updates + "u-#{temp.posted_on}")
+            all_prices: prop.all_prices + ",#{temp.price}",
+            all_updates: prop.all_updates + "u-#{temp.posted_on}")
+        elsif prop.status == 'closed'
+          p 'Price or status updated - updating record'
+          prop.update(
+            urls: prop.urls + ",#{temp.urls}",
+            price: temp.price,
+            status: 'updated',
+            all_prices: prop.all_prices + ",#{temp.price}",
+            all_updates: prop.all_updates + "u-#{temp.posted_on}")
         else
-          p 'in loop 2'
-          p.update(urls: p.urls + ",#{temp.urls}")
+          p 'Same price and status - updating record'
+          prop.update(urls: prop.urls + ",#{temp.urls}")
         end
       else
         temp.save

@@ -25,14 +25,14 @@ class ScraperWorker
       listings_small[:closed].each do |l|
         p "CLOSING : #{i} / #{listings_full[:closed].length}"
         begin
-            p = Property.find(l[:id])
+            prop = Property.find(l[:id])
             a = true
-            p.urls_array.each do |u|
+            prop.urls_array.each do |u|
               a = a & scraper.is_add_removed?(u)
             end
             if a
-              all_updates = p.all_updates + ",c-#{Time.now.strftime("%d/%m/%Y")}"
-              p.update({
+              all_updates = prop.all_updates + ",c-#{Time.now.strftime("%d/%m/%Y")}"
+              prop.update({
                 status: 'closed',
                 removed_on: Time.now.strftime("%d/%m/%Y"),
                 all_updates: all_updates
@@ -51,10 +51,10 @@ class ScraperWorker
       listings_small[:updated].each do |l|
         p "UPDATING : #{i} / #{listings_full[:updated].length}"
         begin
-          p = Property.find(l[:id])
-          all_updates = p.all_updates + ",u-#{Time.now.strftime("%d/%m/%Y")}"
-          all_prices = p.all_prices + ",#{l[:price]}"
-          p.update({
+          prop = Property.find(l[:id])
+          all_updates = prop.all_updates + ",u-#{Time.now.strftime("%d/%m/%Y")}"
+          all_prices = prop.all_prices + ",#{l[:price]}"
+          prop.update({
             status: 'updated',
             updated_on: Time.now.strftime("%d/%m/%Y"),
             price: l[:price],
@@ -71,12 +71,8 @@ class ScraperWorker
       p '------- CREATING LISTINGS --------'
       listings_small[:new].each do |l|
         p "CREATING : #{i} / #{listings_full[:new].length}"
-        begin
-          p = scraper.scrap_one_listing(l[:url])
-          Property.save_new_listing(p.merge(urls: l[:url], status: 'open'))
-        rescue
-          p 'Error - listing could not be created'
-        end
+          prop = scraper.scrap_one_listing(l[:url])
+          Property.save_new_listing(prop.merge(urls: l[:url], status: 'open'))
         i += 1
       end
     end
