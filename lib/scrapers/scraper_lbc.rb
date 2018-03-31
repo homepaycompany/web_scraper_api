@@ -76,6 +76,9 @@ class Scrapers::ScraperLbc
       },
       page: {
         query: 'o'
+      },
+      search_query: {
+        query: 'q'
       }
     }
 
@@ -84,11 +87,7 @@ class Scrapers::ScraperLbc
   def scrap_one_page_html(options = {})
     query = "?"
     options.each do |k, v|
-      if k.to_s == "search_location"
-        query += "&#{@query_params[k][:query]}=#{v}"
-      elsif k.to_s == 'page'
-        query += "&#{@query_params[k][:query]}=#{v}"
-      elsif @query_params[k][:scale][v] != ''
+      if @query_params[k][:scale][v] != ''
         if k.to_s == 'property_type'
           v.each do |t|
             query += "&#{@query_params[k][:query]}=#{@query_params[k][:scale][t]}"
@@ -96,6 +95,8 @@ class Scrapers::ScraperLbc
         else
           query += "&#{@query_params[k][:query]}=#{@query_params[k][:scale][v]}"
         end
+      else
+        query += "&#{@query_params[k][:query]}=#{v}"
       end
     end
     url = @base_search_url + query
