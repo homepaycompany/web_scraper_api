@@ -28,7 +28,9 @@ class Property < ApplicationRecord
 
   def self.listings_open_urls_prices_and_ids(options = {})
     a = {}
-    self.all.select{ |l| l.status != 'closed' }.each do |l|
+    self.all.select{ |l| l.status != 'closed' &&
+      l.search_location == options[:search_location] &&
+      (options[:min_price]..options[:max_price]).include?(l.price)}.each do |l|
       l.urls_array.each do |u|
         a[u] = {price: l.price, id: l.id}
       end
@@ -47,40 +49,51 @@ class Property < ApplicationRecord
   # Perform check on a new listing : if already in DB then store the URL, if not then create a new Property
   def self.save_new_listing(options = {})
     if options[:price] && options[:location] && options [:property_type] && options [:livable_size_sqm]
-      temp = Property.new(options.merge({all_prices: options[:price], all_updates: "c-#{options[:posted_on]}"}))
+      temp = Property.new(options.merge({ all_prices: options[:price], all_updates: "c-#{options[:posted_on]}" }))
       temp.geocode
       prop = self.check_for_duplicate(temp)
       if prop
         p '!! Duplicate found !!'
-        if prop.price != temp.price
-          p 'Price or status updated - updating record'
-          prop.update(
-            urls: prop.urls + ",#{temp.urls}",
-            price: temp.price,
-            status: 'updated',
-            all_prices: prop.all_prices + ",#{temp.price}",
-            all_updates: prop.all_updates + "u-#{temp.posted_on}")
-        elsif prop.status == 'closed'
-          p 'Price or status updated - updating record'
-          prop.update(
-            urls: prop.urls + ",#{temp.urls}",
-            price: temp.price,
-            status: 'updated',
-            all_prices: prop.all_prices + ",#{temp.price}",
-            all_updates: prop.all_updates + "u-#{temp.posted_on}")
-        else
-          p 'Same price and status - updating record'
-          prop.update(urls: prop.urls + ",#{temp.urls}")
-        end
+        prop.update_listing(temp.attributes)
       else
         temp.save
       end
     else
-      p 'Creating incomplete property'
+      p '!! Creating incomplete property !!'
       Property.create(options.merge({
-                                all_prices: options[:price],
-                                all_updates: "c-#{options[:posted_on]}",
-                                status: 'incomplete'}))
+        all_prices: options[:price],
+        all_updates: "c-#{options[:posted_on]}",
+        status: 'incomplete'}))
+    end
+  end
+
+  def update_listing(options = {})
+    options.each do |k,v|
+      if self.send(k).nil? && v
+        self.write_attribute(k,v)
+      end
+    end
+    if options[:price] && options[:price]!= self.price
+      self.price = options[k]
+      self.all_prices = self.all_prices + ",#{options[:price]}"
+      self.status = 'updated'
+      self.all_updates = self.all_updates + "u-#{options[:posted_on] || Time.now.strftime('%d/%m/%Y')}"
+    end
+    if options[:url] && !self.urls_array.include?(options[:url])
+      self.urls = self.urls + ",#{options[:url]}"
+    end
+    if self.save
+      p 'record updated'
+    end
+  end
+
+  def close_listing
+    self.all_updates = self.all_updates + ",c-#{Time.now.strftime("%d/%m/%Y")}"
+    self.status = 'closed'
+    self.removed_on = Time.now.strftime("%d/%m/%Y")
+    self.all_updates = all_updates
+    if self.save
+      p 'record updated'
     end
   end
 

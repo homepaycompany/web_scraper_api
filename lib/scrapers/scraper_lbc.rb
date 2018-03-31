@@ -26,7 +26,10 @@ class Scrapers::ScraperLbc
           550000 => 18,
           600000 => 19,
           650000 => 20,
-          700000 => 21
+          700000 => 21,
+          800000 => 22,
+          900000 => 23,
+          1000000 => 24
         }
       },
       max_price: {
@@ -49,7 +52,10 @@ class Scrapers::ScraperLbc
           550000 => 18,
           600000 => 19,
           650000 => 20,
-          700000 => 21
+          700000 => 21,
+          800000 => 22,
+          900000 => 23,
+          1000000 => 24
         }
       },
       property_type: {
@@ -57,7 +63,7 @@ class Scrapers::ScraperLbc
         scale: {house: 1,
           appartment: 2}
       },
-      location: {
+      search_location: {
         query: 'location'
       },
       user_type: {
@@ -78,7 +84,7 @@ class Scrapers::ScraperLbc
   def scrap_one_page_html(options = {})
     query = "?"
     options.each do |k, v|
-      if k.to_s == "location"
+      if k.to_s == "search_location"
         query += "&#{@query_params[k][:query]}=#{v}"
       elsif k.to_s == 'page'
         query += "&#{@query_params[k][:query]}=#{v}"
@@ -178,7 +184,6 @@ class Scrapers::ScraperLbc
   end
 
   def is_add_removed?(html_doc)
-    p html_doc.search('h1').first.text
     html_doc.search('h1').first.text == 'Cette annonce est désactivée' ? true : false
   end
 end
