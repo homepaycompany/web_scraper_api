@@ -60,8 +60,8 @@ class Scrapers::ScraperLbc
       },
       property_type: {
         query: 'ret',
-        scale: {house: 1,
-          appartment: 2}
+        scale: {'house' => 1,
+          'appartment' => 2}
       },
       search_location: {
         query: 'location'
@@ -69,9 +69,9 @@ class Scrapers::ScraperLbc
       user_type: {
         query: 'f',
         scale: {
-          owner: 'p',
-          professionals: 'c',
-          all: ''
+          'owner' => 'p',
+          'professionals' => 'c',
+          'all' => ''
         }
       },
       page: {
@@ -84,10 +84,11 @@ class Scrapers::ScraperLbc
 
   end
 
-  def scrap_one_page_html(options = {})
+  def scrap_one_page_html(search_params = {})
     query = "?"
-    options.each do |k, v|
-      if @query_params[k][:scale][v] != ''
+    search_params.each do |k, v|
+      if @query_params[k].nil?
+      elsif @query_params[k][:scale]
         if k.to_s == 'property_type'
           v.each do |t|
             query += "&#{@query_params[k][:query]}=#{@query_params[k][:scale][t]}"
@@ -105,10 +106,14 @@ class Scrapers::ScraperLbc
     html_doc = Nokogiri::HTML(html_file)
   end
 
+  def has_listings?(html_doc)
+    !html_doc.search(@listing_class).nil?
+  end
+
   def get_all_pages_numbers(html_doc)
     pages_container = html_doc.search('.pagination_links_container')
     pages = []
-    if pages_container
+    if pages_container.first
       pages_container.first.search('a').each do |a|
         pages << a.text.to_i
       end

@@ -5,26 +5,32 @@ class ScraperWorker
 
 
   def perform(options)
-    if options[:search_location]
+    options = options.symbolize_keys
+    p options[:search_params]
+    search_params = options[:search_params].symbolize_keys
+    if search_params[:search_location]
       @scraper = Scrapers::ScraperDispatch.new(options[:website])
-      if options[:load_point_of_interest]
+      if options[:load_points_of_interest]
+        p 'in points_of_interest'
         loader = Loaders::LoaderPointsOfInterest.new()
-        loader.points_of_interest(options[:search_location]).each do |l|
-          scrap_logic(options.merge(search_query: l[:query], point_of_interest: l[:point_of_interest]))
+        loader.points_of_interest(search_params[:search_location]).each do |l|
+          p "scraping #{l[:query]}"
+          scrap_logic(search_params.merge(search_query: l[:query], point_of_interest: l[:point_of_interest]))
         end
       end
-      scrap_logic(options)
+      p 'scraping all'
+      # scrap_logic(search_params)
     end
   end
 
   private
 
-  def scrap_logic(options)
+  def scrap_logic(search_params)
     # Get listings URLs and Prices
-    all_urls_and_prices = @scraper.get_listings_urls_and_prices(options)
+    all_urls_and_prices = @scraper.get_listings_urls_and_prices(search_params)
     p "------- #{all_urls_and_prices.length} URLS ---------"
     # Check what listings are new, have been updated or closed
-    listings = Property.filter_listings(all_urls_and_prices, options)
+    listings = Property.filter_listings(all_urls_and_prices, search_params)
     p "NEW : #{listings[:new].length} "
     p "UPDATED : #{listings[:updated].length} "
     p "CLOSED : #{listings[:closed].length} "
@@ -33,13 +39,13 @@ class ScraperWorker
     # Update listings that have been updated
     update_listings(listings[:updated])
     # Scrap new listings
-    create_listings(listings[:new], options)
+    create_listings(listings[:new], search_params)
   end
 
-  def close_listings(listings, options = {})
+  def close_listings(listings)
     p '------- CLOSING LISTINGS --------'
     listings.each_with_index do |l,i|
-      p "CLOSING : #{i+1} / #{listings[:closed].length}"
+      p "CLOSING : #{i + 1} / #{listings.length}"
       begin
           prop = Property.find(l[:id])
           a = true
@@ -57,10 +63,10 @@ class ScraperWorker
     end
   end
 
-  def update_listings(listings, options = {})
+  def update_listings(listings)
     p '------- UPDATING LISTINGS --------'
     listings.each_with_index do |l,i|
-      p "UPDATING : #{i+1} / #{listings[:updated].length}"
+      p "UPDATING : #{i + 1} / #{listings.length}"
       begin
         prop = Property.find(l[:id])
         prop.update_listing({price: l[:price]})
@@ -70,15 +76,16 @@ class ScraperWorker
     end
   end
 
-  def create_listings(listings, options = {})
+  def create_listings(listings, search_params = {})
     p '------- CREATING LISTINGS --------'
     listings.each_with_index do |l,i|
-      p "CREATING : #{i+1} / #{listings[:new].length}"
+      p "CREATING : #{i + 1} / #{listings.length}"
         prop = @scraper.scrap_one_listing(l[:url])
         Property.save_new_listing(prop.merge(urls: l[:url],
           status: 'open',
-          search_location: options[:search_location],
-          location: (options[:point_of_interest] || prop[:location])))
+          search_location: search_params[:search_location],
+          location: (search_params[:point_of_interest] || prop[:location]),
+          point_of_interest: search_params[:search_query]))
     end
   end
 end

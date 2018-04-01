@@ -19,7 +19,7 @@ class Loaders::LoaderPointsOfInterest
     CSV.foreach(@filepath) do |row|
       @points_of_interest_all << {location: row[0].downcase,
         query: row[2].downcase.force_encoding('ASCII-8BIT'),
-        point_of_interest: "#{row[2].downcase}, #{row[1].downcase}, #{row[0].downcase}"}
+        point_of_interest: "#{row[2].downcase if row[2]}, #{row[1].downcase if row[1]}, #{row[0].downcase if row[0]}"}
     end
   end
 end

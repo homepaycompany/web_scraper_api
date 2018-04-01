@@ -8,18 +8,20 @@ class Scrapers::ScraperDispatch
     end
   end
 
-  def get_listings_urls_and_prices(options)
+  def get_listings_urls_and_prices(search_params)
     # Create empty hash for listings urls and prices
     all_urls_and_prices = {}
     # Scrap first listings page (page number 1) and store listings urls in all_urland_prices array
-    page_1 = @scraper.scrap_one_page_html(options.merge({ page: 1 }))
-    all_urls_and_prices.merge!(@scraper.get_listings_urls_and_prices(page_1))
-    # Check if there are other pages and replicate process for each : scrap page, extract listings urls
-    p @scraper.get_all_pages_numbers(page_1)
-    @scraper.get_all_pages_numbers(page_1).each do |n|
-      all_urls_and_prices.merge!(@scraper.get_listings_urls_and_prices(@scraper.scrap_one_page_html(options.merge({ page: n }))))
+    page_1 = @scraper.scrap_one_page_html(search_params.merge({ page: 1 }))
+    if @scraper.has_listings?(page_1)
+      all_urls_and_prices.merge!(@scraper.get_listings_urls_and_prices(page_1))
+      # Check if there are other pages and replicate process for each : scrap page, extract listings urls
+      p @scraper.get_all_pages_numbers(page_1)
+      @scraper.get_all_pages_numbers(page_1).each do |n|
+        all_urls_and_prices.merge!(@scraper.get_listings_urls_and_prices(@scraper.scrap_one_page_html(search_params.merge({ page: n }))))
+      end
+      return all_urls_and_prices
     end
-    return all_urls_and_prices
   end
 
   def scrap_one_listing(url)
