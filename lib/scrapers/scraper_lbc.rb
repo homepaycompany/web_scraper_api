@@ -103,7 +103,16 @@ class Scrapers::ScraperLbc
     end
     url = @base_search_url + query
     p url
-    html_file = open(url).read
+    html_file = ''
+    10.times do |i|
+      p i
+      begin
+        html_file = open(url).read
+        break
+      rescue
+        p 'Error - open URL failed'
+      end
+    end
     html_doc = Nokogiri::HTML(html_file)
   end
 
@@ -124,11 +133,13 @@ class Scrapers::ScraperLbc
   end
 
   def get_listings_urls_and_prices(html_doc)
-    listing_urls_and_prices = {}
-    html_doc.search(@listing_class).each do |l|
-      listing_urls_and_prices["https:#{l.attribute('href').value}"] = l.search('h3').attribute('content').value.to_i
+    if html_doc
+      listing_urls_and_prices = {}
+      html_doc.search(@listing_class).each do |l|
+        listing_urls_and_prices["https:#{l.attribute('href').value}"] = l.search('h3').attribute('content').value.to_i
+      end
+      return listing_urls_and_prices
     end
-    return listing_urls_and_prices
   end
 
   def get_listing_html(url)
