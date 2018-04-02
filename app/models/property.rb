@@ -2,7 +2,8 @@ class Property < ApplicationRecord
   require 'fuzzy_match'
   require 'amatch'
   FuzzyMatch.engine = :amatch
-  geocoded_by :location
+  geocoded_by :address
+  reverse_geocoded_by :latitude, :longitude
 
   # Gets a hash of listings structured as an url and a price and returns a hash with 3 arrays
   # new: array with hashs of urls to scrap
@@ -51,9 +52,13 @@ class Property < ApplicationRecord
 
   # Perform check on a new listing : if already in DB then store the URL, if not then create a new Property
   def self.save_new_listing(search_params = {})
-    if search_params[:price] && search_params[:location] && search_params [:property_type] && search_params [:livable_size_sqm]
+    if search_params[:price] && search_params[:location_type] && search_params [:property_type] && search_params [:livable_size_sqm]
       temp = Property.new(search_params.merge({ all_prices: search_params[:price], all_updates: "c-#{search_params[:posted_on]}" }))
-      temp.geocode
+      if temp[:location_type] == 'address'
+        temp.reverse_geocode
+      else
+        temp.geocode
+      end
       prop = self.check_for_duplicate(temp)
       if prop
         p '!! Duplicate found !!'
