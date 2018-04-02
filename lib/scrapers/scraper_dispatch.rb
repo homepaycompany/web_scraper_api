@@ -11,7 +11,7 @@ class Scrapers::ScraperDispatch
   def get_listings_urls_and_prices(search_params)
     # Create empty hash for listings urls and prices
     all_urls_and_prices = {}
-    # Scrap first listings page (page number 1) and store listings urls in all_urland_prices array
+    # Scrap first page (page number 1) and store listings urls in all_urland_prices array
     page_1 = @scraper.scrap_one_page_html(search_params.merge({ page: 1 }))
     if @scraper.has_listings?(page_1)
       all_urls_and_prices.merge!(@scraper.get_listings_urls_and_prices(page_1))
