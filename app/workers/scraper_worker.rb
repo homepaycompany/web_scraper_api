@@ -91,7 +91,7 @@ class ScraperWorker
           else
             params = params.merge(
               point_of_interest: search_params[:search_query],
-              address: search_params[:point_of_interest]
+              address: search_params[:point_of_interest],
               location_type: 'point_of_interest')
           end
         end
