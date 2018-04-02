@@ -19,7 +19,7 @@ class ScraperWorker
         end
       end
       p 'scraping all'
-      # scrap_logic(search_params)
+      scrap_logic(search_params)
     end
   end
 
@@ -80,12 +80,22 @@ class ScraperWorker
     p '------- CREATING LISTINGS --------'
     listings.each_with_index do |l,i|
       p "CREATING : #{i + 1} / #{listings.length}"
-        prop = @scraper.scrap_one_listing(l[:url])
-        Property.save_new_listing(prop.merge(urls: l[:url],
-          status: 'open',
-          search_location: search_params[:search_location],
-          location: (search_params[:point_of_interest] || prop[:location]),
-          point_of_interest: search_params[:search_query]))
+      prop = @scraper.scrap_one_listing(l[:url])
+      params = prop.merge(urls: l[:url],
+        status: 'open',
+        search_location: search_params[:search_location])
+      #begin
+        if search_params[:point_of_interest]
+          if prop.location_type == 'address'
+            params = params.merge(point_of_interest: search_params[:search_query])
+          else
+            params = params.merge(point_of_interest: search_params[:search_query], address: search_params[:point_of_interest])
+          end
+        end
+        Property.save_new_listing(params)
+      #rescue
+       # p 'Error - listing could not be created'
+      #end
     end
   end
 end
