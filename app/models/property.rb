@@ -62,8 +62,6 @@ class Property < ApplicationRecord
       prop = self.check_for_duplicate(temp)
       if prop
         p '!! Duplicate found !!'
-        p temp
-        p prop
         prop.update_listing(temp.attributes)
       else
         temp.save
