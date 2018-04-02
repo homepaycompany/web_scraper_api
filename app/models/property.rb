@@ -8,10 +8,10 @@ class Property < ApplicationRecord
   # new: array with hashs of urls to scrap
   # updated: array with hashs of properties to update structured as their ids and prices
   # closed: array with hashs of properties to close structured as their ids
-  def self.filter_listings(listings_hash, options = {})
+  def self.filter_listings(listings_hash, search_params = {})
     n = [] # Instantiate empty array for new listings
     u = [] # Instantiate empty array for listings that have been updated
-    l = self.listings_open_urls_prices_and_ids(options) # Get list of all listings still opened in DB - format : {url: {id, price}}
+    l = self.listings_open_urls_prices_and_ids(search_params) # Get list of all listings still opened in DB - format : {url: {id, price}}
     c = l.keys.map { |u| l[u][:id] } # Create array with ids of all opened listings in DB, from which we will remove those still opened
     listings_hash.each do |k,v| # Iterate over each listing in the params
       if l.keys.include?(k) # Check if the url is already in DB, by looking if its url is already stored
@@ -26,9 +26,14 @@ class Property < ApplicationRecord
     return { new: n, updated: u, closed: c.map { |i| { id: i } } }
   end
 
-  def self.listings_open_urls_prices_and_ids(options = {})
+  def self.listings_open_urls_prices_and_ids(search_params = {})
     a = {}
-    self.all.select{ |l| l.status != 'closed' }.each do |l|
+    self.all.select{ |l|
+      l.status != 'closed' &&
+      l.search_location == search_params[:search_location] &&
+      (search_params[:min_price]..search_params[:max_price]).include?(l.price) &&
+      (l.point_of_interest == search_params[:search_query] if search_params[:search_query])
+      }.each do |l|
       l.urls_array.each do |u|
         a[u] = {price: l.price, id: l.id}
       end
@@ -45,42 +50,53 @@ class Property < ApplicationRecord
   end
 
   # Perform check on a new listing : if already in DB then store the URL, if not then create a new Property
-  def self.save_new_listing(options = {})
-    if options[:price] && options[:location] && options [:property_type] && options [:livable_size_sqm]
-      temp = Property.new(options.merge({all_prices: options[:price], all_updates: "c-#{options[:posted_on]}"}))
+  def self.save_new_listing(search_params = {})
+    if search_params[:price] && search_params[:location] && search_params [:property_type] && search_params [:livable_size_sqm]
+      temp = Property.new(search_params.merge({ all_prices: search_params[:price], all_updates: "c-#{search_params[:posted_on]}" }))
       temp.geocode
       prop = self.check_for_duplicate(temp)
       if prop
         p '!! Duplicate found !!'
-        if prop.price != temp.price
-          p 'Price or status updated - updating record'
-          prop.update(
-            urls: prop.urls + ",#{temp.urls}",
-            price: temp.price,
-            status: 'updated',
-            all_prices: prop.all_prices + ",#{temp.price}",
-            all_updates: prop.all_updates + "u-#{temp.posted_on}")
-        elsif prop.status == 'closed'
-          p 'Price or status updated - updating record'
-          prop.update(
-            urls: prop.urls + ",#{temp.urls}",
-            price: temp.price,
-            status: 'updated',
-            all_prices: prop.all_prices + ",#{temp.price}",
-            all_updates: prop.all_updates + "u-#{temp.posted_on}")
-        else
-          p 'Same price and status - updating record'
-          prop.update(urls: prop.urls + ",#{temp.urls}")
-        end
+        prop.update_listing(temp.attributes)
       else
         temp.save
       end
     else
-      p 'Creating incomplete property'
-      Property.create(options.merge({
-                                all_prices: options[:price],
-                                all_updates: "c-#{options[:posted_on]}",
-                                status: 'incomplete'}))
+      p '!! Creating incomplete property !!'
+      Property.create(search_params.merge({
+        all_prices: search_params[:price],
+        all_updates: "c-#{search_params[:posted_on]}",
+        status: 'incomplete'}))
+    end
+  end
+
+  def update_listing(search_params = {})
+    search_params.each do |k,v|
+      if self.send(k).nil? && v
+        self.write_attribute(k,v)
+      end
+    end
+    if search_params[:price] && search_params[:price]!= self.price
+      self.price = search_params[k]
+      self.all_prices = self.all_prices + ",#{search_params[:price]}"
+      self.status = 'updated'
+      self.all_updates = self.all_updates + "u-#{search_params[:posted_on] || Time.now.strftime('%d/%m/%Y')}"
+    end
+    if search_params[:url] && !self.urls_array.include?(search_params[:url])
+      self.urls = self.urls + ",#{search_params[:url]}"
+    end
+    if self.save
+      p 'record updated'
+    end
+  end
+
+  def close_listing
+    self.all_updates = self.all_updates + ",c-#{Time.now.strftime("%d/%m/%Y")}"
+    self.status = 'closed'
+    self.removed_on = Time.now.strftime("%d/%m/%Y")
+    self.all_updates = all_updates
+    if self.save
+      p 'record updated'
     end
   end
 
@@ -89,14 +105,14 @@ class Property < ApplicationRecord
   # Gets a listing and check wether it already exists in DB by performing checks on its price,
   # location and description, and if not then saves it in DB
   def self.check_for_duplicate(property)
-    # Get relevant property attributes to be passed as options for the WHERE portion of the search
+    # Get relevant property attributes to be passed as search_params for the WHERE portion of the search
     l = Property.near([property.latitude, property.longitude], 10)
-    options = {
+    search_params = {
       property_type: property.property_type,
       livable_size_sqm: (property.livable_size_sqm - 1)..(property.livable_size_sqm + 1),
       price: property.price*0.8..property.price*1.2
     }
-    a = l.where(options)
+    a = l.where(search_params)
     r = FuzzyMatch.new(a, :read => :description).find(property.description)
     if r
       m = Amatch::PairDistance.new("#{r.description}")

@@ -1,88 +1,92 @@
 class ScraperWorker
   include Sidekiq::Worker
   include Scrapers
+  include Loaders
 
 
-  def perform(website)
-    options = {location: 'toulouse', property_type: [:house, :appartment], min_price: 100000, max_price: 400000, user_type: :owner}
-    if options[:location]
-      # Instantiate scraper
-      scraper = Scrapers::ScraperDispatch.new(website)
-      # Get listings URLs and Prices
-      all_urls_and_prices = scraper.get_listings_urls_and_prices(options)
-      p "------- #{all_urls_and_prices.length} URLS ---------"
-      # Check what listings are new, have been updated or closed
-      listings_full = Property.filter_listings(all_urls_and_prices, options)
-      p "NEW : #{listings_full[:new].length} "
-      p "UPDATED : #{listings_full[:updated].length} "
-      p "CLOSED : #{listings_full[:closed].length} "
-      # Break up list of url to scrap in smaller pieces for later jobs if necessary
-      # =========== TBD
-      listings_small = listings_full
-      i = 1
-      # Close listings that have been closed
-      p '------- CLOSING LISTINGS --------'
-      listings_small[:closed].each do |l|
-        p "CLOSING : #{i} / #{listings_full[:closed].length}"
-        begin
-            prop = Property.find(l[:id])
-            a = true
-            prop.urls_array.each do |u|
-              a = a & scraper.is_add_removed?(u)
-            end
-            if a
-              all_updates = prop.all_updates + ",c-#{Time.now.strftime("%d/%m/%Y")}"
-              prop.update({
-                status: 'closed',
-                removed_on: Time.now.strftime("%d/%m/%Y"),
-                all_updates: all_updates
-                })
-            else
-              p 'Add has not be removed'
-            end
-          rescue
-          p 'Error - listing could not be closed'
+  def perform(options)
+    options = options.symbolize_keys
+    p options[:search_params]
+    search_params = options[:search_params].symbolize_keys
+    if search_params[:search_location]
+      @scraper = Scrapers::ScraperDispatch.new(options[:website])
+      if options[:load_points_of_interest]
+        p 'in points_of_interest'
+        loader = Loaders::LoaderPointsOfInterest.new()
+        loader.points_of_interest(search_params[:search_location]).each do |l|
+          p "scraping #{l[:query]}"
+          scrap_logic(search_params.merge(search_query: l[:query], point_of_interest: l[:point_of_interest]))
         end
-        i += 1
       end
-      i = 1
-      # Update listings that have been updated
-      p '------- UPDATING LISTINGS --------'
-      listings_small[:updated].each do |l|
-        p "UPDATING : #{i} / #{listings_full[:updated].length}"
-        begin
-          prop = Property.find(l[:id])
-          all_updates = prop.all_updates + ",u-#{Time.now.strftime("%d/%m/%Y")}"
-          all_prices = prop.all_prices + ",#{l[:price]}"
-          prop.update({
-            status: 'updated',
-            updated_on: Time.now.strftime("%d/%m/%Y"),
-            price: l[:price],
-            all_updates: all_updates,
-            all_prices: all_prices
-            })
-        rescue
-          p 'Error - listing could not be updated'
-        end
-        i += 1
-      end
-      i = 1
-      # Scrap new listings
-      p '------- CREATING LISTINGS --------'
-      listings_small[:new].each do |l|
-        p "CREATING : #{i} / #{listings_full[:new].length}"
-          prop = scraper.scrap_one_listing(l[:url])
-          Property.save_new_listing(prop.merge(urls: l[:url], status: 'open'))
-        i += 1
-      end
+      p 'scraping all'
+      # scrap_logic(search_params)
     end
-
-    # TEST SECTION
-    # p = Property.last.attributes
-    # p p['id']
-    # p['description'] = "A vendre mai environ 130 m² le chat est beau à la campagne sur un terrain une cuisine aménagée et équipée, 3 grandes chambres dont une de 20 partir d'ici le matin camion campagne ains wcA l'étage une grande pièce de 25 m² (55 au sol) + grenier aménageableChauffage central bois + fuel"
-    # Property.save_new_listing(p.merge(urls: 'test', status: 'open'))
   end
 
+  private
+
+  def scrap_logic(search_params)
+    # Get listings URLs and Prices
+    all_urls_and_prices = @scraper.get_listings_urls_and_prices(search_params)
+    p "------- #{all_urls_and_prices.length} URLS ---------"
+    # Check what listings are new, have been updated or closed
+    listings = Property.filter_listings(all_urls_and_prices, search_params)
+    p "NEW : #{listings[:new].length} "
+    p "UPDATED : #{listings[:updated].length} "
+    p "CLOSED : #{listings[:closed].length} "
+    # Close listings that have been closed
+    close_listings(listings[:closed])
+    # Update listings that have been updated
+    update_listings(listings[:updated])
+    # Scrap new listings
+    create_listings(listings[:new], search_params)
+  end
+
+  def close_listings(listings)
+    p '------- CLOSING LISTINGS --------'
+    listings.each_with_index do |l,i|
+      p "CLOSING : #{i + 1} / #{listings.length}"
+      begin
+          prop = Property.find(l[:id])
+          a = true
+          prop.urls_array.each do |u|
+            a = a & @scraper.is_add_removed?(u)
+          end
+          if a
+            prop.close_listing
+          else
+            p 'Listing has not been removed'
+          end
+        rescue
+        p 'Error - listing could not be closed'
+      end
+    end
+  end
+
+  def update_listings(listings)
+    p '------- UPDATING LISTINGS --------'
+    listings.each_with_index do |l,i|
+      p "UPDATING : #{i + 1} / #{listings.length}"
+      begin
+        prop = Property.find(l[:id])
+        prop.update_listing({price: l[:price]})
+      rescue
+        p 'Error - listing could not be updated'
+      end
+    end
+  end
+
+  def create_listings(listings, search_params = {})
+    p '------- CREATING LISTINGS --------'
+    listings.each_with_index do |l,i|
+      p "CREATING : #{i + 1} / #{listings.length}"
+        prop = @scraper.scrap_one_listing(l[:url])
+        Property.save_new_listing(prop.merge(urls: l[:url],
+          status: 'open',
+          search_location: search_params[:search_location],
+          location: (search_params[:point_of_interest] || prop[:location]),
+          point_of_interest: search_params[:search_query]))
+    end
+  end
 end
 
