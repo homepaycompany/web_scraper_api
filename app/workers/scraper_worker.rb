@@ -84,7 +84,7 @@ class ScraperWorker
       params = prop.merge(urls: l[:url],
         status: 'open',
         search_location: search_params[:search_location])
-      #begin
+      begin
         if search_params[:point_of_interest]
           if prop.location_type == 'address'
             params = params.merge(point_of_interest: search_params[:search_query])
@@ -93,9 +93,9 @@ class ScraperWorker
           end
         end
         Property.save_new_listing(params)
-      #rescue
-       # p 'Error - listing could not be created'
-      #end
+      rescue
+        p 'Error - listing could not be created'
+      end
     end
   end
 end
