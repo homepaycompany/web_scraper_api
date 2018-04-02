@@ -70,8 +70,7 @@ class Scrapers::ScraperLbc
         query: 'f',
         scale: {
           'owner' => 'p',
-          'v' => 'c',
-          'all' => ''
+          'v' => 'c'
         }
       },
       page: {

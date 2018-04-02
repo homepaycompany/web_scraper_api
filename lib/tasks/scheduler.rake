@@ -6,9 +6,9 @@ task :scrap_listings_toulouse => :environment do
       search_location: 'toulouse',
       property_type: ['house', 'appartment'],
       min_price: 100000,
-      max_price: 1000000,
-      user_type: 'all'}
+      max_price: 1000000
     }
+  }
   ScraperWorker.perform_async(options)
 end
 
