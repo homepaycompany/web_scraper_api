@@ -143,102 +143,113 @@ class Scrapers::ScraperLbc
   end
 
   def get_listing_html(url)
-    listing_html_file = open(url).read
+    listing_html_file = ''
+    10.times do |i|
+      p "trying url: #{i + 1}/10"
+      begin
+        listing_html_file = open(url).read
+        break
+      rescue
+        p 'Error - open URL failed'
+      end
+    end
     listing_html_doc = Nokogiri::HTML(listing_html_file)
   end
 
   def extract_listing_information(html_doc)
-    listing = {}
-    html_doc.search('script').each do |s|
-      if s.text.match(/(window.FLUX_STATE = )({.*})$/ )
-        ad = JSON.parse(s.text.match(/[window.FLUX_STATE = ]({.*})$/ )[1])['adview']
-        begin
-          listing[:name] = ad['subject']
-        rescue
-          p 'Error - no title'
-        end
-        begin
-          listing[:description] = ad['body']
-        rescue
-          p 'Error - no description'
-        end
-        begin
-          listing[:price] = ad['price'][0]
-        rescue
-          p 'Error - no price'
-        end
-        begin
-          listing[:posted_on] = ad['first_publication_date']
-        rescue
-          p 'Error - no postage date'
-        end
+    if html_doc
+      listing = {}
+      html_doc.search('script').each do |s|
+        if s.text.match(/(window.FLUX_STATE = )({.*})$/ )
+          ad = JSON.parse(s.text.match(/[window.FLUX_STATE = ]({.*})$/ )[1])['adview']
+          begin
+            listing[:name] = ad['subject']
+          rescue
+            p 'Error - no title'
+          end
+          begin
+            listing[:description] = ad['body']
+          rescue
+            p 'Error - no description'
+          end
+          begin
+            listing[:price] = ad['price'][0]
+          rescue
+            p 'Error - no price'
+          end
+          begin
+            listing[:posted_on] = ad['first_publication_date']
+          rescue
+            p 'Error - no postage date'
+          end
 
-        begin
-          ad['attributes'].each do |a|
-            if a['key'] == 'real_estate_type'
-              begin
-                property_type = a['value_label']
-                if property_type.match(/maison/i)
-                  listing[:property_type] = 'house'
-                elsif property_type.match(/appartement/i)
-                  listing[:property_type] = 'appartment'
-                elsif property_type.match(/terrain/i)
-                  listing[:property_type] = 'terrain'
-                elsif property_type.match(/immeuble/i)
-                  listing[:property_type] = 'building'
+          begin
+            ad['attributes'].each do |a|
+              if a['key'] == 'real_estate_type'
+                begin
+                  property_type = a['value_label']
+                  if property_type.match(/maison/i)
+                    listing[:property_type] = 'house'
+                  elsif property_type.match(/appartement/i)
+                    listing[:property_type] = 'appartment'
+                  elsif property_type.match(/terrain/i)
+                    listing[:property_type] = 'terrain'
+                  elsif property_type.match(/immeuble/i)
+                    listing[:property_type] = 'building'
+                  end
+                rescue
+                  p 'Error - no property type'
                 end
-              rescue
-                p 'Error - no property type'
-              end
-            elsif a['key'] == 'rooms'
-              begin
-                listing[:num_rooms] = a['value']
-              rescue
-                p 'Error - no number of rooms'
-              end
-            elsif a['key'] == 'square'
-              begin
-                listing[:livable_size_sqm] = a['value']
-              rescue
-                p 'Error - no livable size'
+              elsif a['key'] == 'rooms'
+                begin
+                  listing[:num_rooms] = a['value']
+                rescue
+                  p 'Error - no number of rooms'
+                end
+              elsif a['key'] == 'square'
+                begin
+                  listing[:livable_size_sqm] = a['value']
+                rescue
+                  p 'Error - no livable size'
+                end
               end
             end
+          rescue
+            p 'Error - no attributes'
           end
-        rescue
-          p 'Error - no attributes'
-        end
 
-        begin
-          listing[:city] = ad['location']['city_label']
-        rescue
-          p 'Error - no city'
-        end
-
-        begin
-          if ad['location']['source'] == 'user'
-            listing[:latitude] = ad['location']['lat']
-            listing[:longitude] = ad['location']['lng']
-            listing[:location_type] = 'address'
-          else
-            listing[:address] = ad['location']['city_label']
-            listing[:location_type] = 'city'
+          begin
+            listing[:city] = ad['location']['city_label']
+          rescue
+            p 'Error - no city'
           end
-        rescue
-          p 'Error - no coordinates'
-        end
 
-        begin
-          if ad['owner']['type'] == 'pro'
-            listing[:user_type] = 'professional'
-          else
-            listing[:user_type] = 'owner'
+          begin
+            if ad['location']['source'] == 'user'
+              listing[:latitude] = ad['location']['lat']
+              listing[:longitude] = ad['location']['lng']
+              listing[:location_type] = 'address'
+            else
+              listing[:address] = ad['location']['city_label']
+              listing[:location_type] = 'city'
+            end
+          rescue
+            p 'Error - no coordinates'
           end
-        rescue
-          p 'Error - no user type'
+
+          begin
+            if ad['owner']['type'] == 'pro'
+              listing[:user_type] = 'professional'
+            else
+              listing[:user_type] = 'owner'
+            end
+          rescue
+            p 'Error - no user type'
+          end
         end
       end
+      return listing
     end
-    return listing
   end
 
   def is_add_removed?(html_doc)
