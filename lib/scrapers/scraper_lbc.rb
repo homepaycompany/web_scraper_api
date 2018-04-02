@@ -105,7 +105,7 @@ class Scrapers::ScraperLbc
     p url
     html_file = ''
     10.times do |i|
-      p i
+      p "trying url: #{i + 1}/10"
       begin
         html_file = open(url).read
         break
