@@ -13,7 +13,7 @@ class ScraperWorker
       if options[:load_points_of_interest]
         p 'in points_of_interest'
         loader = Loaders::LoaderPointsOfInterest.new()
-        loader.points_of_interest(search_params[:search_location]).each do |l|
+        loader.points_of_interest(search_params[:search_location])[0..100].each do |l|
           p "scraping #{l[:query]}"
           scrap_logic(search_params.merge(search_query: l[:query], point_of_interest: l[:point_of_interest]))
         end
@@ -86,10 +86,13 @@ class ScraperWorker
         search_location: search_params[:search_location])
       begin
         if search_params[:point_of_interest]
-          if prop.location_type == 'address'
+          if prop[:location_type] == 'address'
             params = params.merge(point_of_interest: search_params[:search_query])
           else
-            params = params.merge(point_of_interest: search_params[:search_query], address: search_params[:point_of_interest])
+            params = params.merge(
+              point_of_interest: search_params[:search_query],
+              address: search_params[:point_of_interest]
+              location_type: 'point_of_interest')
           end
         end
         Property.save_new_listing(params)

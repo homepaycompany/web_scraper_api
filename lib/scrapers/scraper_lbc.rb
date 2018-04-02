@@ -97,7 +97,7 @@ class Scrapers::ScraperLbc
           query += "&#{@query_params[k][:query]}=#{@query_params[k][:scale][v]}"
         end
       else
-        query += "&#{@query_params[k][:query]}=#{v}"
+        query += "&#{@query_params[k][:query]}=#{URI.escape(v)}"
       end
     end
     url = @base_search_url + query
