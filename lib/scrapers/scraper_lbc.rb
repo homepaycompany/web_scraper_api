@@ -1,6 +1,6 @@
-require 'open-uri'
-require 'nokogiri'
 class Scrapers::ScraperLbc
+  require 'open-uri'
+  require 'nokogiri'
 
   def initialize
     @base_search_url = 'https://www.leboncoin.fr/ventes_immobilieres/offres/'
@@ -103,17 +103,7 @@ class Scrapers::ScraperLbc
     end
     url = @base_search_url + query
     p url
-    html_file = ''
-    10.times do |i|
-      p "trying url: #{i + 1}/10"
-      begin
-        html_file = open(url).read
-        break
-      rescue
-        p 'Error - open URL failed'
-      end
-    end
-    html_doc = Nokogiri::HTML(html_file)
+    open_url(url)
   end
 
   def has_listings?(html_doc)
@@ -142,18 +132,20 @@ class Scrapers::ScraperLbc
     end
   end
 
-  def get_listing_html(url)
-    listing_html_file = ''
-    10.times do |i|
-      p "trying url: #{i + 1}/10"
+  def open_url(url)
+    html_file = ''
+    # 10.times do |i|
+    #   p "trying url: #{i + 1}/10"
+    t = Time.now
       begin
-        listing_html_file = open(url).read
-        break
+        html_file = open(url).read
+        # break
       rescue
         p 'Error - open URL failed'
       end
-    end
-    listing_html_doc = Nokogiri::HTML(listing_html_file)
+    p Time.now - t
+    # end
+    return Nokogiri::HTML(html_file)
   end
 
   def extract_listing_information(html_doc)
