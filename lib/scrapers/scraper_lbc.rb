@@ -138,12 +138,15 @@ class Scrapers::ScraperLbc
     #   p "trying url: #{i + 1}/10"
     t = Time.now
       begin
-        html_file = open(url).read
+        html = open(url)
+    a = Time.now
+    p "open - #{a - t}"
+        html_file = html.read
         # break
+    p "read - #{Time.now - a}"
       rescue
         p 'Error - open URL failed'
       end
-    p Time.now - t
     # end
     return Nokogiri::HTML(html_file)
   end

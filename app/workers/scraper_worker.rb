@@ -78,7 +78,7 @@ class ScraperWorker
 
   def create_listings(listings, search_params = {})
     p '------- CREATING LISTINGS --------'
-    listings.each_with_index do |l,i|
+    listings[0..2].each_with_index do |l,i|
       p "CREATING : #{i + 1} / #{listings.length}"
       prop = @scraper.scrap_one_listing(l[:url])
       params = prop.merge(urls: l[:url],
