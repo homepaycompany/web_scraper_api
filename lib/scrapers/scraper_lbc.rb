@@ -5,7 +5,7 @@ class Scrapers::ScraperLbc
 
   def initialize
     @base_search_url = 'https://www.leboncoin.fr/ventes_immobilieres'
-    @site = Faraday.new(:url => @base_search_url, :ssl => { verify: false })
+    @site = Faraday.new :url => @base_search_url, :ssl => {:verify => false}
     @listing_class = '.tabsContent ul li a'
     @query_params = {
       min_price: {
@@ -139,7 +139,6 @@ class Scrapers::ScraperLbc
     t = Time.now
     html_file = @site.get query
     p "open url: #{Time.now - t}"
-    p Nokogiri::HTML(html_file.body)
     return Nokogiri::HTML(html_file.body)
   end
 
