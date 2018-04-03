@@ -1,11 +1,11 @@
 class Scrapers::ScraperLbc
   require 'open-uri'
   require 'nokogiri'
-  require 'faraday'
+  # require 'faraday'
 
   def initialize
-    @base_search_url = 'https://www.leboncoin.fr/ventes_immobilieres'
-    @site = Faraday.new :url => @base_search_url, :ssl => false
+    @base_search_url = 'https://www.leboncoin.fr/ventes_immobilieres/offres/'
+    # @site = Faraday.new :url => @base_search_url, :ssl => false
     @listing_class = '.tabsContent ul li a'
     @query_params = {
       min_price: {
@@ -86,7 +86,7 @@ class Scrapers::ScraperLbc
   end
 
   def scrap_one_page_html(search_params = {})
-    query = "/offres/?"
+    query = "?"
     search_params.each do |k, v|
       if @query_params[k].nil?
       elsif @query_params[k][:scale]
@@ -135,11 +135,12 @@ class Scrapers::ScraperLbc
   end
 
   def open_url(url)
-    query = url.match(/[#{@base_search_url}]*(.+)/)[1]
+    # query = url.match(/[#{@base_search_url}]*(.+)/)[1]
     t = Time.now
-    html_file = @site.get query
+    # html_file = @site.get query
+    html_file = open(url).read
     p "open url: #{Time.now - t}"
-    return Nokogiri::HTML(html_file.body)
+    return Nokogiri::HTML(html_file)
   end
 
   def extract_listing_information(html_doc)

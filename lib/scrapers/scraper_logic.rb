@@ -2,6 +2,11 @@ class Scrapers::ScraperLogic
   include Loaders
 
   def scrap(options)
+    require 'openssl'
+
+    prev_setting = OpenSSL::SSL.send(:remove_const, :VERIFY_PEER)
+    OpenSSL::SSL.const_set(:VERIFY_PEER, OpenSSL::SSL::VERIFY_NONE)
+
     options = options.symbolize_keys
     p options[:search_params]
     search_params = options[:search_params].symbolize_keys
@@ -18,6 +23,9 @@ class Scrapers::ScraperLogic
       p 'scraping all'
       scrap_logic(search_params)
     end
+
+    OpenSSL::SSL.send(:remove_const, :VERIFY_PEER)
+    OpenSSL::SSL.const_set(:VERIFY_PEER, prev_setting)
   end
 
   private
