@@ -26,6 +26,9 @@ gem 'puma', '~> 3.7'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 
+# Using Farady to send HTTP requests
+gem 'faraday', '~> 0.14.0'
+
 # Using sidekiq to handle job queues
 gem 'sidekiq'
 gem 'sidekiq-failures', '~> 1.0'

@@ -159,6 +159,7 @@ PLATFORMS
 DEPENDENCIES
   amatch (~> 0.3.0)
   byebug
+  faraday (~> 0.14.0)
   figaro
   fuzzy_match (~> 2.1)
   geocoder
@@ -172,6 +173,9 @@ DEPENDENCIES
   spring
   spring-watcher-listen (~> 2.0.0)
   tzinfo-data
+
+RUBY VERSION
+   ruby 2.4.3p205
 
 BUNDLED WITH
    1.16.1
