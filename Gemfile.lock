@@ -159,7 +159,6 @@ PLATFORMS
 DEPENDENCIES
   amatch (~> 0.3.0)
   byebug
-  faraday (~> 0.14.0)
   figaro
   fuzzy_match (~> 2.1)
   geocoder
