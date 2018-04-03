@@ -25,12 +25,12 @@ class Scrapers::ScraperDispatch
   end
 
   def scrap_one_listing(url)
-    listing = @scraper.extract_listing_information(@scraper.get_listing_html(url))
+    listing = @scraper.extract_listing_information(@scraper.open_url(url))
     return listing
   end
 
   def is_add_removed?(url)
-    return @scraper.is_add_removed?(@scraper.get_listing_html(url))
+    return @scraper.is_add_removed?(@scraper.open_url(url))
   end
 
 end
