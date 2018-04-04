@@ -138,7 +138,8 @@ class Scrapers::ScraperLbc
     # query = url.match(/[#{@base_search_url}]*(.+)/)[1]
     t = Time.now
     # html_file = @site.get query
-    html_file = open(url).read
+    proxy = URI.parse('http://80.211.4.187:8080')
+    html_file = open(url, proxy: proxy).read
     p "open url: #{Time.now - t}"
     return Nokogiri::HTML(html_file)
   end
