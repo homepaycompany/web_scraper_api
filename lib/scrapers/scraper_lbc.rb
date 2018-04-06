@@ -1,9 +1,11 @@
 class Scrapers::ScraperLbc
   require 'open-uri'
   require 'nokogiri'
+  include Proxies
   # require 'faraday'
 
   def initialize
+    @proxy = Proxies::Proxy.new
     @base_search_url = 'https://www.leboncoin.fr/ventes_immobilieres/offres/'
     # @site = Faraday.new :url => @base_search_url, :ssl => false
     @listing_class = '.tabsContent ul li a'
@@ -135,13 +137,14 @@ class Scrapers::ScraperLbc
   end
 
   def open_url(url)
-    # query = url.match(/[#{@base_search_url}]*(.+)/)[1]
-    t = Time.now
-    # html_file = @site.get query
-    proxy = URI.parse('http://80.211.4.187:8080')
-    html_file = open(url, proxy: proxy).read
-    p "open url: #{Time.now - t}"
-    return Nokogiri::HTML(html_file)
+    return @proxy.open_url(url)
+    # # query = url.match(/[#{@base_search_url}]*(.+)/)[1]
+    # t = Time.now
+    # # html_file = @site.get query
+    # proxy = URI.parse('http://80.211.4.187:8080')
+    # html_file = open(url, proxy: proxy).read
+    # p "open url: #{Time.now - t}"
+    # return Nokogiri::HTML(html_file)
   end
 
   def extract_listing_information(html_doc)
