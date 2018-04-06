@@ -32,8 +32,7 @@ class Property < ApplicationRecord
     self.all.select{ |l|
       l.status != 'closed' &&
       l.search_location == search_params[:search_location] &&
-      (search_params[:min_price]..search_params[:max_price]).include?(l.price) &&
-      (l.point_of_interest == search_params[:search_query] if search_params[:search_query])
+      (search_params[:min_price]..search_params[:max_price]).include?(l.price)
       }.each do |l|
       l.urls_array.each do |u|
         a[u] = {price: l.price, id: l.id}
@@ -61,13 +60,16 @@ class Property < ApplicationRecord
       end
       prop = self.check_for_duplicate(temp)
       if prop
-        p '!! Duplicate found !!'
+        p '-- Duplicate found'
         prop.update_listing(temp.attributes)
       else
+        if temp.location_type == "address"
+          temp.need_to_enrich_location = true
+        end
         temp.save
       end
     else
-      p '!! Creating incomplete property !!'
+      p '-- Creating incomplete property'
       Property.create(search_params.merge({
         all_prices: search_params[:price],
         all_updates: "c-#{search_params[:posted_on]}",

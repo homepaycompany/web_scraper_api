@@ -14,11 +14,11 @@ module Proxies
     def open_url(url)
       t = Time.now
       try = 1
-      while try < 20
+      while try < 10
         p 'trying'
         begin
-          html_file = open(url, proxy: get_proxy, read_timeout: 3).read
-          try = 20
+          html_file = open(url, proxy: get_proxy).read
+          try = 10
         rescue
           p 'proxy failed'
           delete_proxy
@@ -33,12 +33,13 @@ module Proxies
 
     def get_proxy
       if @proxy_usage == 0
-        return @proxies.sample
+        return @proxies.first
       elsif @proxy_use < @proxy_max_usage
         return @proxy
       else
-        @proxy_usage == 0
-        return @proxy = @proxies.sample
+        delete_proxy
+        @proxies << @proxy
+        return @proxy = @proxies.first
       end
     end
 

@@ -1,13 +1,8 @@
 class Scrapers::ScraperLbc
-  require 'open-uri'
   require 'nokogiri'
-  include Proxies
-  # require 'faraday'
 
   def initialize
-    @proxy = Proxies::Proxy.new
     @base_search_url = 'https://www.leboncoin.fr/ventes_immobilieres/offres/'
-    # @site = Faraday.new :url => @base_search_url, :ssl => false
     @listing_class = '.tabsContent ul li a'
     @query_params = {
       min_price: {
@@ -87,7 +82,7 @@ class Scrapers::ScraperLbc
 
   end
 
-  def scrap_one_page_html(search_params = {})
+  def build_listings_page_url(search_params = {})
     query = "?"
     search_params.each do |k, v|
       if @query_params[k].nil?
@@ -106,8 +101,6 @@ class Scrapers::ScraperLbc
       end
     end
     url = @base_search_url + query
-    p url
-    open_url(url)
   end
 
   def has_listings?(html_doc)
@@ -136,15 +129,8 @@ class Scrapers::ScraperLbc
     end
   end
 
-  def open_url(url)
-    return @proxy.open_url(url)
-    # # query = url.match(/[#{@base_search_url}]*(.+)/)[1]
-    # t = Time.now
-    # # html_file = @site.get query
-    # proxy = URI.parse('http://80.211.4.187:8080')
-    # html_file = open(url, proxy: proxy).read
-    # p "open url: #{Time.now - t}"
-    # return Nokogiri::HTML(html_file)
+  def is_add_removed?(html_doc)
+    html_doc.search('h1').first.text == 'Cette annonce est désactivée' ? true : false
   end
 
   def extract_listing_information(html_doc)
@@ -153,97 +139,121 @@ class Scrapers::ScraperLbc
       html_doc.search('script').each do |s|
         if s.text.match(/(window.FLUX_STATE = )({.*})$/ )
           ad = JSON.parse(s.text.match(/[window.FLUX_STATE = ]({.*})$/ )[1])['adview']
-          begin
-            listing[:name] = ad['subject']
-          rescue
-            p 'Error - no title'
-          end
-          begin
-            listing[:description] = ad['body']
-          rescue
-            p 'Error - no description'
-          end
-          begin
-            listing[:price] = ad['price'][0]
-          rescue
-            p 'Error - no price'
-          end
-          begin
-            listing[:posted_on] = ad['first_publication_date']
-          rescue
-            p 'Error - no postage date'
-          end
-
-          begin
-            ad['attributes'].each do |a|
-              if a['key'] == 'real_estate_type'
-                begin
-                  property_type = a['value_label']
-                  if property_type.match(/maison/i)
-                    listing[:property_type] = 'house'
-                  elsif property_type.match(/appartement/i)
-                    listing[:property_type] = 'appartment'
-                  elsif property_type.match(/terrain/i)
-                    listing[:property_type] = 'terrain'
-                  elsif property_type.match(/immeuble/i)
-                    listing[:property_type] = 'building'
-                  end
-                rescue
-                  p 'Error - no property type'
-                end
-              elsif a['key'] == 'rooms'
-                begin
-                  listing[:num_rooms] = a['value']
-                rescue
-                  p 'Error - no number of rooms'
-                end
-              elsif a['key'] == 'square'
-                begin
-                  listing[:livable_size_sqm] = a['value']
-                rescue
-                  p 'Error - no livable size'
-                end
-              end
-            end
-          rescue
-            p 'Error - no attributes'
-          end
-
-          begin
-            listing[:city] = ad['location']['city_label']
-          rescue
-            p 'Error - no city'
-          end
-
-          begin
-            if ad['location']['source'] == 'user'
-              listing[:latitude] = ad['location']['lat']
-              listing[:longitude] = ad['location']['lng']
-              listing[:location_type] = 'address'
-            else
-              listing[:address] = ad['location']['city_label']
-              listing[:location_type] = 'city'
-            end
-          rescue
-            p 'Error - no coordinates'
-          end
-
-          begin
-            if ad['owner']['type'] == 'pro'
-              listing[:user_type] = 'professional'
-            else
-              listing[:user_type] = 'owner'
-            end
-          rescue
-            p 'Error - no user type'
-          end
+          get_name(listing, ad)
+          get_desc(listing, ad)
+          get_price(listing, ad)
+          get_attributes(listing, ad)
+          get_city(listing, ad)
+          get_location(listing, ad)
         end
       end
       return listing
     end
   end
 
-  def is_add_removed?(html_doc)
-    html_doc.search('h1').first.text == 'Cette annonce est désactivée' ? true : false
+  private
+
+  def get_name(listing, ad)
+    begin
+      listing[:name] = ad['subject']
+    rescue
+      p 'Error - no title'
+    end
+  end
+
+  def get_desc(listing, ad)
+    begin
+      listing[:description] = ad['body']
+    rescue
+      p 'Error - no description'
+    end
+  end
+
+  def get_price(listing, ad)
+    begin
+      listing[:price] = ad['price'][0]
+    rescue
+      p 'Error - no price'
+    end
+  end
+
+  def get_postage_date(listing, ad)
+    begin
+      listing[:posted_on] = ad['first_publication_date']
+    rescue
+      p 'Error - no postage date'
+    end
+  end
+
+  def get_attributes(listing, ad)
+    begin
+      ad['attributes'].each do |a|
+        if a['key'] == 'real_estate_type'
+          begin
+            property_type = a['value_label']
+            if property_type.match(/maison/i)
+              listing[:property_type] = 'house'
+            elsif property_type.match(/appartement/i)
+              listing[:property_type] = 'appartment'
+            elsif property_type.match(/terrain/i)
+              listing[:property_type] = 'terrain'
+            elsif property_type.match(/immeuble/i)
+              listing[:property_type] = 'building'
+            end
+          rescue
+            p 'Error - no property type'
+          end
+        elsif a['key'] == 'rooms'
+          begin
+            listing[:num_rooms] = a['value']
+          rescue
+            p 'Error - no number of rooms'
+          end
+        elsif a['key'] == 'square'
+          begin
+            listing[:livable_size_sqm] = a['value']
+          rescue
+            p 'Error - no livable size'
+          end
+        end
+      end
+    rescue
+      p 'Error - no attributes'
+    end
+  end
+
+  def get_city(listing, ad)
+    begin
+      listing[:city] = ad['location']['city_label']
+    rescue
+      p 'Error - no city'
+    end
+  end
+
+  def get_location(listing, ad)
+    begin
+      if ad['location']['source'] == 'user'
+        listing[:latitude] = ad['location']['lat']
+        listing[:longitude] = ad['location']['lng']
+        listing[:location_type] = 'address'
+      else
+        listing[:address] = ad['location']['city_label']
+        listing[:location_type] = 'city'
+      end
+    rescue
+      p 'Error - no coordinates'
+    end
+  end
+
+  def get_user_type(listing, ad)
+    begin
+      if ad['owner']['type'] == 'pro'
+        listing[:user_type] = 'professional'
+      else
+        listing[:user_type] = 'owner'
+      end
+    rescue
+      p 'Error - no user type'
+    end
   end
 end
