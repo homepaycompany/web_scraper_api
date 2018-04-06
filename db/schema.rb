@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180406105503) do
+ActiveRecord::Schema.define(version: 20180406153229) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,7 +60,12 @@ ActiveRecord::Schema.define(version: 20180406105503) do
     t.string "location_type"
     t.string "user_type"
     t.boolean "need_to_enrich_location", default: true
-    t.integer "agent_commission"
+    t.boolean "need_to_enrich_attributes", default: true
+    t.float "size_balcony_sqm"
+    t.float "size_terrace_sqm"
+    t.float "size_cellar_sqm"
+    t.boolean "sold_rented"
+    t.float "agent_commission"
   end
 
 end

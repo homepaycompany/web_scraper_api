@@ -1,7 +1,9 @@
 # Job that iterates through listings with inexact locations and tries to add a point of
 # interest by matching the listing's name + description to the points of interest list
 class AddPointOfInterestWorker
+  include Sidekiq::Worker
   include Loaders
+
   def perform
     @loader = Loaders::LoaderPointsOfInterest.new()
     properties = Property.where(need_to_enrich_location: true)

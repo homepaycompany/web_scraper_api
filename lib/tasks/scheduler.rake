@@ -19,7 +19,6 @@ task :add_point_of_interest_to_listings => :environment do
   AddPointOfInterestWorker.perform_async
 end
 
-
 # desc "This task is called by the Heroku scheduler add-on - scrapping without job"
 # task :scrap_no_job => :environment do
 #   include Scrapers
