@@ -9,23 +9,23 @@ class EnrichListingsLocationWorker
     @loader = Loaders::LoaderPointsOfInterest.new()
     @regex_matcher = RegexMatchers::MatcherListingLocation.new()
     properties = Property.where(need_to_enrich_location: true).where(search_location: 'paris')
-    properties.each do |property|
+    properties[0..1].each do |property|
       add_point_of_interest(property)
     end
   end
 
   def add_point_of_interest(property)
-    points = @loader.points_of_interest_queries(property.search_location)
+    points_of_interest = @loader.points_of_interest_queries_by_type(property.search_location)
     s = @regex_matcher.get_sanithized_string("#{property.name} #{property.description}")
     p "-------------------------------------- #{property.id}"
     r = {street: {}, area: {}}
     begin
-      points.each do |k, v|
-        v.each do |point|
+      points_of_interest.each do |type, points|
+        points.keys.each do |point|
           point_sanithized = @regex_matcher.get_sanithized_string(point)
           z = s.index (/#{point_sanithized}/i)
           if z
-            r[k][point.to_sym] = z
+            r[type][point] = z
           else
             trigrams = point_sanithized.trigrams.map { |t| t.join }
             trigrams[0..(trigrams.length / 2) + 1].each_with_index do |t, i|
@@ -50,7 +50,7 @@ class EnrichListingsLocationWorker
                    end
                 end
                 if g >= trigrams.length * 0.8
-                  r[k][point.to_sym] ||= t_matches.first
+                  r[type][point] ||= t_matches.first
                 else
                   t_matches.shift
                   g = 0
@@ -66,11 +66,16 @@ class EnrichListingsLocationWorker
     begin
       if !r[:street].empty?
         m = r[:street].min_by { |k,v| v }.first
+        address = points_of_interest[:street][m]
       elsif !r[:area].empty?
         m = r[:area].min_by { |k,v| v }.first
+        address = points_of_interest[:area][m]
       end
       if m
-        property.address = m
+        p 'found match'
+        p m
+        p address
+        property.address = address
         property.geocode
         property.location_type = 'point_of_interest'
       end
