@@ -13,11 +13,14 @@ module Proxies
 
     def open_url(url)
       t = Time.now
+      html_file = ''
       try = 1
       while try < 10
         begin
-          html_file = open(url, proxy: get_proxy).read
-          try = 10
+          Timeout.timeout(3) do
+            html_file = open(url, proxy: get_proxy).read
+            try = 10
+          end
         rescue
           p 'proxy failed'
           delete_proxy
@@ -54,7 +57,7 @@ module Proxies
     end
 
     def delete_proxy
-      @proxies.delete(@proxy)
+      @proxies.shift
       @proxy_usage = 0
     end
   end
