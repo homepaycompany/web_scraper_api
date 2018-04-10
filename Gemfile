@@ -41,8 +41,17 @@ gem 'ruby_ngrams', '~> 0.0.6'
 # Geocoding listings with google geocoder gem
 gem "geocoder"
 
-# using figaro for secrets
+# Using Figaro for secrets
 gem 'figaro'
+
+# User Devise for authentification
+gem 'devise'
+
+# Forest for back office
+gem 'forest_liana'
+
+# Mailing
+gem "letter_opener", group: :development
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
