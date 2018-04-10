@@ -24,12 +24,12 @@ class ScrapWorker
     p "NEW : #{listings[:new].length} "
     p "UPDATED : #{listings[:updated].length} "
     p "CLOSED : #{listings[:closed].length} "
-    # # Close listings that have been closed
-    # close_listings(listings[:closed])
-    # # Update listings that have been updated
-    # update_listings(listings[:updated])
-    # # Scrap new listings
-    # create_listings(listings[:new], search_params)
+    # Close listings that have been closed
+    close_listings(listings[:closed])
+    # Update listings that have been updated
+    update_listings(listings[:updated])
+    # Scrap new listings
+    create_listings(listings[:new], search_params)
   end
 
   def close_listings(listings)
