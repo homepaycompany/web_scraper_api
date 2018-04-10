@@ -5,9 +5,9 @@ class EnrichListingsAttributesWorker
   def perform
     regex_matcher = RegexMatchers::MatcherListingAttributes.new()
     properties = Property.where(need_to_enrich_attributes: true)
-    properties.each do |property|
+    propertyies.each do |property|
       begin
-        p l.id
+        p property.id
         regex_matcher.enrich_listing_attributes(property)
         property.attributes_enriched_at = Time.now
         property.save

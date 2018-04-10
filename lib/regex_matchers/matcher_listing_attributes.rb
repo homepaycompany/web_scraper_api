@@ -108,12 +108,12 @@ class RegexMatchers::MatcherListingAttributes
       {
         match_field: :num_bathrooms,
         regex: [
-          "[^A-Za-z0-9_]+@NUM_RANK@?[ ]?salles*[ ]?de[ ]?bains*",
-          "salles*[ ]?de[ ]?bains*[-: ]+@NUM_INT@[^A-Za-z0-9_]",
+          "[^A-Za-z0-9_]+@NUM_RANK@?[ ]?salles*(?:de| )?bains*",
+          "salles*(?:de| )?bains*[-: ]+@NUM_INT@[^A-Za-z0-9_]",
           "sdb[-: ]+@NUM_INT@[^A-Za-z0-9_]",
           "[^A-Za-z0-9_]+@NUM_RANK@?[ ]?sdb",
-          "[^A-Za-z0-9_]+@NUM_LIT@[ ]?salles*[ ]?de[ ]?bains*",
-          "salles*[ ]?de[ ]?bains*[-: ]+@NUM_LIT@[^A-Za-z0-9_]",
+          "[^A-Za-z0-9_]+@NUM_LIT@[ ]?salles*(?:de| )?bains*",
+          "salles*(?:de| )?bains*[-: ]+@NUM_LIT@[^A-Za-z0-9_]",
           "sdb[-: ]+@NUM_LIT@[^A-Za-z0-9_]",
           "[^A-Za-z0-9_]+@NUM_LIT@[ ]?sdb"
         ]
