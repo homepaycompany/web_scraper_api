@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180406153229) do
+ActiveRecord::Schema.define(version: 20180410081800) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,6 +66,8 @@ ActiveRecord::Schema.define(version: 20180406153229) do
     t.float "size_cellar_sqm"
     t.boolean "sold_rented"
     t.float "agent_commission"
+    t.date "attributes_enriched_at"
+    t.date "location_enriched_at"
   end
 
 end

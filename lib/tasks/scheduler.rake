@@ -15,8 +15,8 @@ task :scrap_listings => :environment do
 end
 
 desc "This task is called by the Heroku scheduler add-on - enriching listings locations with points of interest"
-task :add_point_of_interest_to_listings => :environment do
-  AddPointOfInterestWorker.perform_async
+task :enrich_listings_location => :environment do
+  EnrichListingsLocationWorker.perform_async
 end
 
 # desc "This task is called by the Heroku scheduler add-on - scrapping without job"

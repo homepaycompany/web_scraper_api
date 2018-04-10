@@ -15,7 +15,6 @@ module Proxies
       t = Time.now
       try = 1
       while try < 10
-        p 'trying'
         begin
           html_file = open(url, proxy: get_proxy).read
           try = 10

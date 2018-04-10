@@ -139,12 +139,12 @@ class Scrapers::ScraperLbc
       html_doc.search('script').each do |s|
         if s.text.match(/(window.FLUX_STATE = )({.*})$/ )
           ad = JSON.parse(s.text.match(/[window.FLUX_STATE = ]({.*})$/ )[1])['adview']
-          get_name(listing, ad)
-          get_desc(listing, ad)
-          get_price(listing, ad)
-          get_attributes(listing, ad)
-          get_city(listing, ad)
-          get_location(listing, ad)
+          get_name!(listing, ad)
+          get_desc!(listing, ad)
+          get_price!(listing, ad)
+          get_attributes!(listing, ad)
+          get_city!(listing, ad)
+          get_location!(listing, ad)
         end
       end
       return listing
@@ -153,7 +153,7 @@ class Scrapers::ScraperLbc
 
   private
 
-  def get_name(listing, ad)
+  def get_name!(listing, ad)
     begin
       listing[:name] = ad['subject']
     rescue
@@ -161,7 +161,7 @@ class Scrapers::ScraperLbc
     end
   end
 
-  def get_desc(listing, ad)
+  def get_desc!(listing, ad)
     begin
       listing[:description] = ad['body']
     rescue
@@ -169,7 +169,7 @@ class Scrapers::ScraperLbc
     end
   end
 
-  def get_price(listing, ad)
+  def get_price!(listing, ad)
     begin
       listing[:price] = ad['price'][0]
     rescue
@@ -177,7 +177,7 @@ class Scrapers::ScraperLbc
     end
   end
 
-  def get_postage_date(listing, ad)
+  def get_postage_date!(listing, ad)
     begin
       listing[:posted_on] = ad['first_publication_date']
     rescue
@@ -185,7 +185,7 @@ class Scrapers::ScraperLbc
     end
   end
 
-  def get_attributes(listing, ad)
+  def get_attributes!(listing, ad)
     begin
       ad['attributes'].each do |a|
         if a['key'] == 'real_estate_type'
@@ -222,7 +222,7 @@ class Scrapers::ScraperLbc
     end
   end
 
-  def get_city(listing, ad)
+  def get_city!(listing, ad)
     begin
       listing[:city] = ad['location']['city_label']
     rescue
@@ -230,7 +230,7 @@ class Scrapers::ScraperLbc
     end
   end
 
-  def get_location(listing, ad)
+  def get_location!(listing, ad)
     begin
       if ad['location']['source'] == 'user'
         listing[:latitude] = ad['location']['lat']
@@ -245,7 +245,7 @@ class Scrapers::ScraperLbc
     end
   end
 
-  def get_user_type(listing, ad)
+  def get_user_type!(listing, ad)
     begin
       if ad['owner']['type'] == 'pro'
         listing[:user_type] = 'professional'

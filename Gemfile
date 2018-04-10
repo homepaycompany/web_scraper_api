@@ -36,6 +36,7 @@ gem 'searchkick', '~> 2.3'
 # Using fuzzy match and amatch to deduplicate listings based on description
 gem 'fuzzy_match', '~> 2.1'
 gem 'amatch', '~> 0.3.0'
+gem 'ruby_ngrams', '~> 0.0.6'
 
 # Geocoding listings with google geocoder gem
 gem "geocoder"
