@@ -9,7 +9,7 @@ class EnrichListingsLocationWorker
     @loader = Loaders::LoaderPointsOfInterest.new()
     @regex_matcher = RegexMatchers::MatcherListingLocation.new()
     properties = Property.where(need_to_enrich_location: true).where(search_location: 'paris')
-    properties.each do |property|
+    properties[0..2].each do |property|
       add_point_of_interest(property)
     end
   end
@@ -17,7 +17,7 @@ class EnrichListingsLocationWorker
   def add_point_of_interest(property)
     points_of_interest = @loader.points_of_interest_queries_by_type(property.search_location)
     s = @regex_matcher.get_sanithized_string("#{property.name} #{property.description}")
-    p "-------------------------------------- #{property.id}"
+    p "----- #{property.id}"
     r = {street: {}, area: {}}
     begin
       points_of_interest.each do |type, points|
@@ -64,17 +64,32 @@ class EnrichListingsLocationWorker
       p "Error - Couldn't match property"
     end
     begin
+      latitude = nil
       if !r[:street].empty?
         m = r[:street].min_by { |k,v| v }.first
-        address = points_of_interest[:street][m]
+        address = points_of_interest[:street][m][:full_name]
+        if points_of_interest[:street][m][:latitude]
+          latidude = points_of_interest[:street][m][:latitude]
+          longidude = points_of_interest[:street][m][:longitude]
+        end
       elsif !r[:area].empty?
         m = r[:area].min_by { |k,v| v }.first
-        address = points_of_interest[:area][m]
+        address = points_of_interest[:area][m][:full_name]
+        if points_of_interest[:area][m][:latitude]
+          latidude = points_of_interest[:area][m][:latitude]
+          longidude = points_of_interest[:area][m][:longitude]
+        end
       end
       if m
+        p m
         property.address = address
-        property.geocode
         property.location_type = 'point_of_interest'
+      end
+      if !latitude.nil?
+        property.latitude = latidude
+        property.longitude = longitude
+      else
+        property.geocode
       end
       property.need_to_enrich_location = false
       property.location_enriched_at = Time.now

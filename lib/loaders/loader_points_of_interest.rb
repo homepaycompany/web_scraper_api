@@ -10,7 +10,13 @@ class Loaders::LoaderPointsOfInterest
   def points_of_interest_queries_by_type(search_location)
     queries = { street: {}, area: {} }
     points_of_interest_full(search_location).each do |point|
-      queries[point[:type].to_sym][point[:query]] = point[:point_of_interest]
+      a = {}
+      a[:full_name] = point[:point_of_interest]
+      if point[:latitude] && point[:longitude]
+        a[:latitude] = point[:latitude]
+        a[:longitude] = point[:longitude]
+      end
+      queries[point[:type].to_sym][point[:query]] = a
     end
     return queries
   end
