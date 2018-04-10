@@ -5,7 +5,7 @@ task :scrap_listings => :environment do
     search_params: {
       property_type: ['house', 'appartment'],
       min_price: 100000,
-      max_price: 100000
+      max_price: 1000000
     }
   }
   cities.each do |c|

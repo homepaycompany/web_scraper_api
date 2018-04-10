@@ -7,7 +7,7 @@ module Proxies
       @proxies = []
       @proxy = ''
       @proxy_usage = 0
-      @proxy_max_usage = 100
+      @proxy_max_usage = 500
       scrap_proxies
     end
 
