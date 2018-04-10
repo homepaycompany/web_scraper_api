@@ -19,17 +19,7 @@ task :enrich_listings_location => :environment do
   EnrichListingsLocationWorker.perform_async
 end
 
-# desc "This task is called by the Heroku scheduler add-on - scrapping without job"
-# task :scrap_no_job => :environment do
-#   include Scrapers
-#   options = {website: 'lbc',
-#     load_points_of_interest: false,
-#     search_params: {
-#       search_location: 'toulouse',
-#       property_type: ['house', 'appartment'],
-#       min_price: 100000,
-#       max_price: 100000
-#     }
-#   }
-#   Scrapers::ScraperLogic.new().scrap(options)
-# end
+desc "This task is called by the Heroku scheduler add-on - enriching listings attributes by matching description"
+task :enrich_listings_attributes => :environment do
+  EnrichListingsAttributesWorker.perform_async
+end
