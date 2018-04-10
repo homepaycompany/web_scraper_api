@@ -107,15 +107,14 @@ class Scrapers::ScraperLbc
     !html_doc.search(@listing_class).nil?
   end
 
-  def get_all_pages_numbers(html_doc)
+  def get_all_pages_numbers(html_doc, page_number)
     pages_container = html_doc.search('.pagination_links_container')
     pages = []
     if pages_container.first
       pages_container.first.search('a').each do |a|
-        pages << a.text.to_i
+        pages << a.text.to_i if a.text.to_i > page_number
       end
     end
-    pages.delete(0)
     return pages
   end
 

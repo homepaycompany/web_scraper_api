@@ -17,7 +17,7 @@ module Proxies
       try = 1
       while try < 10
         begin
-          Timeout.timeout(3) do
+          Timeout.timeout(5) do
             html_file = open(url, proxy: get_proxy).read
             try = 10
           end

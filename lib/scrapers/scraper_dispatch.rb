@@ -18,11 +18,18 @@ class Scrapers::ScraperDispatch
     page_1 = @proxy.open_url(page_1_url)
     if @scraper.has_listings?(page_1)
       all_urls_and_prices.merge!(@scraper.get_listings_urls_and_prices(page_1))
-      # Check if there are other pages and replicate process for each : scrap page, extract listings urls
-      @scraper.get_all_pages_numbers(page_1).each do |n|
+      pages_numbers = @scraper.get_all_pages_numbers(page_1, 1)
+      while !pages_numbers.empty?
+        # build url, scrap pages number and add to array if necessary, and merge page listings with prices & urls
+        n = pages_numbers.first
         page_n_url = @scraper.build_listings_page_url(search_params.merge({ page: n }))
-        all_urls_and_prices.merge!(@scraper.get_listings_urls_and_prices(@proxy.open_url(page_n_url)))
+        page_n = @proxy.open_url(page_n_url)
+        pages_numbers << @scraper.get_all_pages_numbers(page_n, n)
+        all_urls_and_prices.merge!(@scraper.get_listings_urls_and_prices(page_n))
+        pages_numbers.flatten!.uniq!
+        pages_numbers.shift
       end
+
       return all_urls_and_prices
     end
   end
