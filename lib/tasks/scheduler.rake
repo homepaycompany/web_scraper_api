@@ -1,17 +1,29 @@
-desc "This task is called by the Heroku scheduler add-on - scrapping listings"
-task :scrap_listings => :environment do
-  cities = ['toulouse', 'paris']
+desc "This task is called by the Heroku scheduler add-on - scrapping listings in toulouse"
+task :scrap_listings_toulouse => :environment do
+  cities = ['toulouse']
   options = {website: 'lbc',
     search_params: {
+      search_location: 'toulouse',
       property_type: ['house', 'appartment'],
       min_price: 100000,
       max_price: 1000000
     }
   }
-  cities.each do |c|
-    options[:search_params][:search_location] = c
-    ScrapWorker.perform_async(options)
-  end
+  ScrapWorker.perform_async(options)
+end
+
+desc "This task is called by the Heroku scheduler add-on - scrapping listings in Paris"
+task :scrap_listings_paris => :environment do
+  cities = ['paris']
+  options = {website: 'lbc',
+    search_params: {
+      search_location: 'paris',
+      property_type: ['house', 'appartment'],
+      min_price: 100000,
+      max_price: 1000000
+    }
+  }
+  ScrapWorker.perform_async(options)
 end
 
 desc "This task is called by the Heroku scheduler add-on - enriching listings locations with points of interest"
