@@ -105,6 +105,18 @@ class Property < ApplicationRecord
     end
   end
 
+  def self.to_csv(properties)
+    attributes = properties.first.attributes.keys
+    CSV.generate(headers: true, col_sep: ';', force_quotes: true, quote_char: '"' ) do |csv|
+      csv << attributes
+      properties.each do |property|
+        property.name = property.name.gsub(/[,"\n]/,'').force_encoding('UTF-8')
+        property.description = property.description.gsub(/[,"\n]/,'').force_encoding('UTF-8')
+        csv << property.attributes.values
+      end
+    end
+  end
+
   private
 
   # Gets a listing and check wether it already exists in DB by performing checks on its price,
