@@ -146,9 +146,11 @@ class Scrapers::ScraperLbc
           get_name!(listing, ad)
           get_desc!(listing, ad)
           get_price!(listing, ad)
+          get_postage_date!(listing, ad)
           get_attributes!(listing, ad)
           get_city!(listing, ad)
           get_location!(listing, ad)
+          get_user_type!(listing, ad)
         end
       end
       return listing
@@ -183,7 +185,7 @@ class Scrapers::ScraperLbc
 
   def get_postage_date!(listing, ad)
     begin
-      listing[:posted_on] = ad['first_publication_date']
+      listing[:posted_on] = ad['first_publication_date'].to_date
     rescue
       p 'Error - no postage date'
     end

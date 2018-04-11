@@ -1,6 +1,5 @@
 desc "This task is called by the Heroku scheduler add-on - scrapping listings in toulouse"
 task :scrap_listings_toulouse => :environment do
-  cities = ['toulouse']
   options = {website: 'lbc',
     search_params: {
       search_location: 'toulouse',
@@ -14,7 +13,6 @@ end
 
 desc "This task is called by the Heroku scheduler add-on - scrapping listings in Paris"
 task :scrap_listings_paris => :environment do
-  cities = ['paris']
   options = {website: 'lbc',
     search_params: {
       search_location: 'paris',
