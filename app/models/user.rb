@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   # Send email after user registration
   after_create :send_welcome_email
+  has_many :alerts
 
   # Devise setup
   devise :database_authenticatable, :registerable,

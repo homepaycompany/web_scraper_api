@@ -1,0 +1,26 @@
+<p style="font-style: EB Garamond;">Bonjour <%= @user.first_name %>,</p>
+
+<p style="font-style: EB Garamond;">Nous avons identifié des annonces immobilières qui pourraient vous intéresser :</p>
+
+<% @properties.each do |property| %>
+  <div style="display: flex; justify-content: space-between;">
+    <div>
+      <%= link_to property.name, property.urls, style: 'color: #20E8B6; text-decoration: none, font-weight: 800;' %>
+      <p>
+        <%= property.price %>
+      </p>
+      <p>
+      </p>
+    </div>
+    <div>
+      <%= image_tag "https://ci3.googleusercontent.com/proxy/ZztktlGb6miaXmUf1lGwUnIIvniAZKLaxzFxDkmzI8WywEkbvFQ_ClQsa7IAWmlDLmQSEqS9yKz7bqWKDohv5MDZYvzSuF_geAtOrsdLHfDy5MQEriVe_ca_QQdA-pllf2QY1u9daycfZ523-W0zktzv1hezdbZLZOt5jwJfJIDu8GVHDYNy915QRX5s4IOE3KkZ9xwPgm8XPCv50zeEhLq1b2Y=s0-d-e1-ft#http://maps.googleapis.com/maps/api/staticmap?markers=Toulouse%20/%20Haute-Garonne&zoom=10&size=120x120&sensor=false&language=fr&sensor=false" %>
+    </div>
+  </div>
+<% end %>
+
+<p style="font-style: EB Garamond;">Si vous avez des questions, n'hésitez pas à nous contacter sur
+  <%= mail_to "contact@helloprosper.fr", "contact@helloprosper.fr", style: 'color: #20E8B6; text-decoration: none' %></p>
+
+<p style="font-style: EB Garamond;">Bonne journée,</p>
+
+<p style="font-style: EB Garamond;">Guillaume, Fondateur <%= link_to "Prosper", "http://www.helloprosper.fr", target: :blank, style: 'color: #20E8B6; font-weight: 800; text-decoration: none' %></p>
