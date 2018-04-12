@@ -52,9 +52,6 @@ gem 'devise'
 # Using Forest for back office
 gem 'forest_liana'
 
-# Using rendered_csv to render content as CSV
-gem 'rendered_csv'
-
 # Mailing
 gem "letter_opener", group: :development
 
