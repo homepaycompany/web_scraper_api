@@ -55,8 +55,6 @@ class Property < ApplicationRecord
       temp = Property.new(search_params.merge({ all_prices: search_params[:price], all_updates: "c-#{search_params[:posted_on]}" }))
       if temp[:location_type] == 'address'
         temp.reverse_geocode
-      else
-        temp.geocode
       end
       prop = self.check_for_duplicate(temp)
       if prop
@@ -64,7 +62,7 @@ class Property < ApplicationRecord
         prop.update_listing(temp.attributes)
       else
         if temp.location_type == "address"
-          temp.need_to_enrich_location = true
+          temp.need_to_enrich_location = false
         end
         temp.save
       end
@@ -104,6 +102,18 @@ class Property < ApplicationRecord
     self.all_updates = all_updates
     if self.save
       p 'record updated'
+    end
+  end
+
+  def self.to_csv(properties)
+    attributes = properties.first.attributes.keys
+    CSV.generate(headers: true, col_sep: ';', force_quotes: true, quote_char: '"' ) do |csv|
+      csv << attributes
+      properties.each do |property|
+        property.name = property.name.gsub(/[,"\n]/,'').force_encoding('UTF-8')
+        property.description = property.description.gsub(/[,"\n]/,'').force_encoding('UTF-8')
+        csv << property.attributes.values
+      end
     end
   end
 

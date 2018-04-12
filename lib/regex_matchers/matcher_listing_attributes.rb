@@ -56,37 +56,37 @@ class RegexMatchers::MatcherListingAttributes
         field: :has_balcony,
         match_field: :size_balcony_sqm,
         regex: [
-          "balcon(?:de| )*@NUM_SQM@?",
-          "[^A-Za-z0-9_]+@NUM_SQM@?[ ]?(?:de| )*balcon"
+          "balcon(?:de| )*(?:@NUM_SQM@)?",
+          "[^A-Za-z0-9_]+(?:@NUM_SQM@)?[ ]?(?:de| )*balcon"
         ]
       },
       {
         field: :has_terrace,
         match_field: :size_terrace_sqm,
         regex: [
-          "terrasse(?:de| )*@NUM_SQM@?",
-          "terrace(?:de| )*@NUM_SQM@?",
-          "terasse(?:de| )*@NUM_SQM@?",
-          "terace(?:de| )*@NUM_SQM@?",
-          "[^A-Za-z0-9_]+@NUM_SQM@?[ ]?(?:de| )*terrasse",
-          "[^A-Za-z0-9_]+@NUM_SQM@?[ ]?(?:de| )*terrace",
-          "[^A-Za-z0-9_]+@NUM_SQM@?[ ]?(?:de| )*terasse",
-          "[^A-Za-z0-9_]+@NUM_SQM@?[ ]?(?:de| )*terace"
+          "terrasse(?:de| )*(?:@NUM_SQM@)?",
+          "terrace(?:de| )*(?:@NUM_SQM@)?",
+          "terasse(?:de| )*(?:@NUM_SQM@)?",
+          "terace(?:de| )*(?:@NUM_SQM@)?",
+          "[^A-Za-z0-9_]+(?:@NUM_SQM@)?(?:de| )*terrasse",
+          "[^A-Za-z0-9_]+(?:@NUM_SQM@)?(?:de| )*terrace",
+          "[^A-Za-z0-9_]+(?:@NUM_SQM@)?(?:de| )*terasse",
+          "[^A-Za-z0-9_]+(?:@NUM_SQM@)?(?:de| )*terace"
         ]
       },
       {
         field: :has_cellar,
         match_field: :size_cellar_sqm,
         regex: [
-          "[, ]+cave(?:de| )*@NUM_SQM@?",
-          "[^A-Za-z0-9_]+@NUM_SQM@?(?:de| )*cave"
+          "[, ]+cave(?:de| )*(?:@NUM_SQM@)?",
+          "[^A-Za-z0-9_]+(?:@NUM_SQM@)?(?:de| )*cave"
         ]
       },
       {
         match_field: :appartment_floor,
         regex: [
-          "au[ ]?@NUM_RANK@",
-          "[^A-Za-z0-9_]+@NUM_RANK@(?:et dernier| )*[ée]tage",
+          "au[ ]?(?:@NUM_RANK@)",
+          "[^A-Za-z0-9_]+(?:@NUM_RANK@)(?:et dernier| )*[ée]tage",
         ]
       },
       {
@@ -99,7 +99,7 @@ class RegexMatchers::MatcherListingAttributes
       {
         match_field: :num_bedrooms,
         regex: [
-          "[^A-Za-z0-9_]+@NUM_RANK@?[ ]?chambres*",
+          "[^A-Za-z0-9_]+@NUM_RANK@[ ]?chambres*",
           "chambres*[-: ]+([1-9]+)[^A-Za-z0-9_]",
           "[^A-Za-z0-9_]+@NUM_LIT@[ ]?chambres*",
           "chambres*[-: ]+@NUM_LIT@[^A-Za-z0-9_]",
@@ -108,10 +108,10 @@ class RegexMatchers::MatcherListingAttributes
       {
         match_field: :num_bathrooms,
         regex: [
-          "[^A-Za-z0-9_]+@NUM_RANK@?[ ]?salles*(?:de| )?bains*",
+          "[^A-Za-z0-9_]+@NUM_RANK@[ ]?salles*(?:de| )?bains*",
           "salles*(?:de| )?bains*[-: ]+@NUM_INT@[^A-Za-z0-9_]",
           "sdb[-: ]+@NUM_INT@[^A-Za-z0-9_]",
-          "[^A-Za-z0-9_]+@NUM_RANK@?[ ]?sdb",
+          "[^A-Za-z0-9_]+@NUM_RANK@[ ]?sdb",
           "[^A-Za-z0-9_]+@NUM_LIT@[ ]?salles*(?:de| )?bains*",
           "salles*(?:de| )?bains*[-: ]+@NUM_LIT@[^A-Za-z0-9_]",
           "sdb[-: ]+@NUM_LIT@[^A-Za-z0-9_]",
@@ -121,17 +121,17 @@ class RegexMatchers::MatcherListingAttributes
       {
         match_field: :agent_commission,
         regex: [
-          "NUM_FLOAT[ ]?%"
+          "@NUM_FLOAT@[ ]?%"
         ]
       }
     ]
     # Match groups for numbers
     @match_groups = {
-      num_int: "([1-9]+)",
-      num_float: "([1-9]+[1-9,. ]*)",
-      num_rank: "([1-9]+)[ ]?(?:e|er|ere|ère|è|nd|eme|ème|me|°|#)",
+      num_int: "([0-9]+)",
+      num_float: "([0-9]+[0-9,. ]*)",
+      num_rank: "([0-9]+)[ ]?(?:e|er|ere|ère|è|nd|eme|ème|me|°|#)",
       num_lit: "(une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|(?:prem|deux|trois|quatr|cinq|six|sept|huit|neuv|dix)(?:ie|ier|iere|ière|ieme|ième))",
-      num_sqm: "([1-9]+[1-9,. ]*)?[ ]?(?:m|M|mètre|metre)s?[2²]?"
+      num_sqm: "([0-9]+[0-9,. ]*)?[ ]?(?:m|M|mètre|metre)s?[2²]?"
     }
   end
 

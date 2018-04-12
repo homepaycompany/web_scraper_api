@@ -26,6 +26,8 @@ gem 'puma', '~> 3.7'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 
+# Using pundit for scoping properties
+gem "pundit"
 # Using sidekiq to handle job queues
 gem 'sidekiq'
 gem 'sidekiq-failures', '~> 1.0'
@@ -44,10 +46,10 @@ gem "geocoder"
 # Using Figaro for secrets
 gem 'figaro'
 
-# User Devise for authentification
+# Using user Devise for authentification
 gem 'devise'
 
-# Forest for back office
+# Using Forest for back office
 gem 'forest_liana'
 
 # Mailing
@@ -55,8 +57,7 @@ gem "letter_opener", group: :development
 gem 'postmark-rails'
 
 group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'pry-byebug'
 end
 
 group :development do
