@@ -1,13 +1,13 @@
 class UserMailer < ApplicationMailer
 
-  # Subject can be set in your I18n file at config/locales/en.yml
-  # with the following lookup:
-  #
-  #   en.user_mailer.welcome.subject
-  #
   def welcome(user)
     @user = user
+    mail(to: @user.email, subject: 'Bienvenue sur Prosper')
+  end
 
-    mail(to: @user.email, subject: 'Bienvenu sur Prosper')
+  def alert(user)
+    @user = user
+    @properties = Property.last(3)
+    mail(to: @user.email, subject: 'Proper / Nouvelles annonces immobilières')
   end
 end

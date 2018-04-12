@@ -89,6 +89,7 @@ GEM
     hashie (3.5.7)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
+    json (2.1.0)
     jsonapi-serializers (1.0.0)
       activesupport
     jwt (2.1.0)
@@ -116,6 +117,12 @@ GEM
       mini_portile2 (~> 2.3.0)
     orm_adapter (0.5.0)
     pg (1.0.0)
+    postmark (1.11.0)
+      json
+      rake
+    postmark-rails (0.16.0)
+      actionmailer (>= 3.0.0)
+      postmark (~> 1.11.0)
     public_suffix (3.0.2)
     puma (3.11.3)
     rack (2.0.4)
@@ -208,6 +215,7 @@ DEPENDENCIES
   letter_opener
   listen (>= 3.0.5, < 3.2)
   pg (>= 0.18, < 2.0)
+  postmark-rails
   puma (~> 3.7)
   rails (~> 5.1.5)
   ruby_ngrams (~> 0.0.6)
