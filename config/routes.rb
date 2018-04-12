@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
   mount ForestLiana::Engine => '/forest'
   devise_for :users
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+
+  namespace :api do
+    namespace :v1 do
+      get "properties/download_to_csv", to: "properties#download_to_csv"
+    end
+  end
 end
