@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180410145103) do
+ActiveRecord::Schema.define(version: 20180412164557) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -73,6 +73,7 @@ ActiveRecord::Schema.define(version: 20180410145103) do
     t.float "agent_commission"
     t.date "attributes_enriched_at"
     t.date "location_enriched_at"
+    t.float "price_per_sqm"
   end
 
   create_table "users", force: :cascade do |t|

@@ -1,6 +1,7 @@
 class Property < ApplicationRecord
   require 'fuzzy_match'
   require 'amatch'
+  before_create :calculate_price_per_sqm!
   FuzzyMatch.engine = :amatch
   geocoded_by :address
   reverse_geocoded_by :latitude, :longitude
@@ -139,5 +140,9 @@ class Property < ApplicationRecord
       end
     end
     return nil
+  end
+
+  def calculate_price_per_sqm!
+    self.price_per_sqm = self.price / self.livable_size_sqm unless self.livable_size_sqm.nil? || self.livable_size_sqm == 0
   end
 end
