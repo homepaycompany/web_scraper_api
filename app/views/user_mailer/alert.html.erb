@@ -4,16 +4,27 @@
 
 <% @properties.each do |property| %>
   <div style="display: flex; justify-content: space-between;">
-    <div>
-      <%= link_to property.name, property.urls, style: 'color: #20E8B6; text-decoration: none, font-weight: 800;' %>
-      <p>
-        <%= property.price %>
+    <div style="margin-bottom: 10px;">
+      <%= link_to property.name, property.urls, style: 'color: #20E8B6; text-decoration: none; font-weight: 800; margin: 0px 0px 10px 0px;' %>
+      <p style="margin: 0px 0px 10px 0px; font-weight: 800;">
+        <%= property.price %>€
       </p>
-      <p>
+      <p style="margin: 0px 0px 10px 0px;">
+        <%= property.livable_size_sqm %>m²
+      </p>
+      <p style="margin: 0px 0px 10px 0px;">
+        <%= property.price_per_sqm %>€/m²
+      </p>
+      <p style="margin: 0px 0px 10px 0px;">
+        <%= property.search_location.capitalize %>
       </p>
     </div>
     <div>
-      <%= image_tag "https://ci3.googleusercontent.com/proxy/ZztktlGb6miaXmUf1lGwUnIIvniAZKLaxzFxDkmzI8WywEkbvFQ_ClQsa7IAWmlDLmQSEqS9yKz7bqWKDohv5MDZYvzSuF_geAtOrsdLHfDy5MQEriVe_ca_QQdA-pllf2QY1u9daycfZ523-W0zktzv1hezdbZLZOt5jwJfJIDu8GVHDYNy915QRX5s4IOE3KkZ9xwPgm8XPCv50zeEhLq1b2Y=s0-d-e1-ft#http://maps.googleapis.com/maps/api/staticmap?markers=Toulouse%20/%20Haute-Garonne&zoom=10&size=120x120&sensor=false&language=fr&sensor=false" %>
+      <% if property.latitude && property.longitude %>
+        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.latitude},#{property.longitude}&zoom=12&size=400x400&key=#{ENV['GOOGLE_API_BROWSER_KEY']}" %>
+      <% elsif property.city %>
+        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.city}&zoom=12&size=400x400&key=#{ENV['GOOGLE_API_BROWSER_KEY']}" %>
+      <% end %>
     </div>
   </div>
 <% end %>
