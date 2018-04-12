@@ -75,6 +75,7 @@ ActiveRecord::Schema.define(version: 20180412170606) do
     t.float "agent_commission"
     t.date "attributes_enriched_at"
     t.date "location_enriched_at"
+    t.float "price_per_sqm"
   end
 
   create_table "users", force: :cascade do |t|
