@@ -1,0 +1,17 @@
+Bonjour <%= @user.first_name %>,
+
+Nous avons identifié des annonces immobilières qui pourraient vous intéresser :
+
+<% @properties.each do |property| %>
+  <%= link_to property.name %>
+  <%= property.price %>€
+  <%= property.livable_size_sqm %>m²
+  <%= property.price_per_sqm %>€/m²
+  <%= property.search_location.capitalize %>
+<% end %>
+
+Si vous avez des questions, n'hésitez pas à nous contacter sur contact@helloprosper.fr
+
+Bonne journée,
+
+Guillaume, Fondateur
