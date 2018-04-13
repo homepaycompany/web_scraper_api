@@ -4,10 +4,13 @@ Nous avons identifié des annonces immobilières qui pourraient vous intéresser
 
 <% @properties.each do |property| %>
   <%= property.name %>
-  <%= property.price %>€
-  <%= property.livable_size_sqm %>m²
-  <%= property.price_per_sqm %>€/m²
-  <%= property.search_location.capitalize %>
+  Prix : <%= property.price %>€ <%= "(#{property.price_per_sqm}€/m²)" if property.price_per_sqm %>
+  Surface : <%= property.livable_size_sqm %>m²
+<% if property.address %>
+  <%= property.address.split.map(&:capitalize).join(' ') %>
+<% else %>
+  <%= property.city.split.map(&:capitalize).join(' ') %>
+<% end %>
 
 <% end %>
 Si vous avez des questions, n'hésitez pas à nous contacter sur contact@helloprosper.fr

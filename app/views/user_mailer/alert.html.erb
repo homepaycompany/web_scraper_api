@@ -3,27 +3,26 @@
 <p style="font-style: EB Garamond;">Nous avons identifié des annonces immobilières qui pourraient vous intéresser :</p>
 
 <% @properties.each do |property| %>
-  <div style="display: flex; justify-content: space-between;">
+  <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
     <div style="margin-bottom: 10px;">
       <%= link_to property.name, property.urls, style: 'color: #20E8B6; text-decoration: none; font-weight: 800; margin: 0px 0px 10px 0px;' %>
       <p style="margin: 0px 0px 10px 0px; font-weight: 800;">
-        <%= property.price %>€
+        Prix : <%= property.price %>€ <%= "(#{property.price_per_sqm}€/m²)" if property.price_per_sqm %>
       </p>
       <p style="margin: 0px 0px 10px 0px;">
-        <%= property.livable_size_sqm %>m²
+        Surface : <%= property.livable_size_sqm %>m²
       </p>
       <p style="margin: 0px 0px 10px 0px;">
-        <%= property.price_per_sqm %>€/m²
+        <% if property.address %>
+          <%= property.address.split.map(&:capitalize).join(' ') %>
+        <% else %>
+          <%= property.city.split.map(&:capitalize).join(' ') %>
+        <% end %>
       </p>
-      <p style="margin: 0px 0px 10px 0px;">
-        <%= property.search_location.capitalize %>
-      </p>
-    </div>
-    <div>
       <% if property.latitude && property.longitude %>
-        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.latitude},#{property.longitude}&zoom=12&size=400x400&key=#{ENV['GOOGLE_API_BROWSER_KEY']}" %>
+        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.latitude},#{property.longitude}&zoom=12&size=400x200&markers=color:red%7C#{property.latitude},#{property.longitude}&key=#{ENV['GOOGLE_API_BROWSER_KEY']}" %>
       <% elsif property.city %>
-        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.city}&zoom=12&size=400x400&key=#{ENV['GOOGLE_API_BROWSER_KEY']}" %>
+        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.city}&markers=color:red%7C#{property.city}&zoom=12&size=400x200&key=#{ENV['GOOGLE_API_BROWSER_KEY']}" %>
       <% end %>
     </div>
   </div>
