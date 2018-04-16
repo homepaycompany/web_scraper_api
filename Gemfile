@@ -54,6 +54,7 @@ gem 'forest_liana'
 
 # Mailing
 gem "letter_opener", group: :development
+gem 'postmark-rails'
 
 group :development, :test do
   gem 'pry-byebug'
