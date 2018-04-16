@@ -26,12 +26,16 @@ class RegexMatchers::MatcherListingLocation
       ],
       voie: [
         'voie', 'voi', 'v', 'voix'
+      ],
+      saint: [
+        'st', 'saint'
       ]
     }
   end
 
   def get_sanithized_string(string)
     s = I18n.transliterate(string).downcase
+    s.gsub!(/[-_'`]/, ' ')
     s.gsub!(/[^a-z0-9 ]/, '')
     @fields.each do |k,v|
       v.each do |w|
