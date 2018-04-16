@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180412170606) do
+ActiveRecord::Schema.define(version: 20180416181959) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,6 +19,13 @@ ActiveRecord::Schema.define(version: 20180412170606) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
+    t.string "city"
+    t.integer "min_price"
+    t.integer "max_price"
+    t.integer "min_size_sqm"
+    t.integer "max_size_sqm"
+    t.float "min_price_per_sqm"
+    t.float "max_price_per_sqm"
     t.index ["user_id"], name: "index_alerts_on_user_id"
   end
 
@@ -76,6 +83,16 @@ ActiveRecord::Schema.define(version: 20180412170606) do
     t.date "attributes_enriched_at"
     t.date "location_enriched_at"
     t.float "price_per_sqm"
+    t.boolean "need_to_add_to_alerts", default: true
+  end
+
+  create_table "property_alerts", force: :cascade do |t|
+    t.bigint "property_id"
+    t.bigint "alert_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["alert_id"], name: "index_property_alerts_on_alert_id"
+    t.index ["property_id"], name: "index_property_alerts_on_property_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -98,4 +115,6 @@ ActiveRecord::Schema.define(version: 20180412170606) do
   end
 
   add_foreign_key "alerts", "users"
+  add_foreign_key "property_alerts", "alerts"
+  add_foreign_key "property_alerts", "properties"
 end

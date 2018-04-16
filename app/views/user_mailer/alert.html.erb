@@ -5,7 +5,7 @@
 <% @properties.each do |property| %>
   <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
     <div style="margin-bottom: 10px;">
-      <%= link_to property.name, property.urls, style: 'color: #20E8B6; text-decoration: none; font-weight: 800; margin: 0px 0px 10px 0px;' %>
+      <%= link_to property.name, property.urls, style: 'color: #20E8B6; text-decoration: none; font-weight: 800; margin: 0px 0px 10px 0px;', target: :blank %>
       <p style="margin: 0px 0px 10px 0px; font-weight: 800;">
         Prix : <%= property.price %>€ <%= "(#{property.price_per_sqm}€/m²)" if property.price_per_sqm %>
       </p>
@@ -20,9 +20,9 @@
         <% end %>
       </p>
       <% if property.latitude && property.longitude %>
-        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.latitude},#{property.longitude}&zoom=12&size=400x200&markers=color:red%7C#{property.latitude},#{property.longitude}&key=#{ENV['GOOGLE_API_BROWSER_KEY']}" %>
+        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.latitude},#{property.longitude}&zoom=12&size=400x200&markers=color:red%7C#{property.latitude},#{property.longitude}&key=#{ENV['GOOGLE_API_SERVER_KEY']}" %>
       <% elsif property.city %>
-        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.city}&markers=color:red%7C#{property.city}&zoom=12&size=400x200&key=#{ENV['GOOGLE_API_BROWSER_KEY']}" %>
+        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.city}&markers=color:red%7C#{property.city}&zoom=12&size=400x200&key=#{ENV['GOOGLE_API_SERVER_KEY']}" %>
       <% end %>
     </div>
   </div>
