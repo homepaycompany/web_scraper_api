@@ -5,7 +5,7 @@ task :scrap_listings_toulouse => :environment do
       search_location: 'toulouse',
       property_type: ['house', 'appartment'],
       min_price: 100000,
-      max_price: 100000
+      max_price: 1000000
     }
   }
   ScrapWorker.perform_async(options)
@@ -18,7 +18,7 @@ task :scrap_listings_paris => :environment do
       search_location: 'paris',
       property_type: ['house', 'appartment'],
       min_price: 100000,
-      max_price: 100000
+      max_price: 1000000
     }
   }
   ScrapWorker.perform_async(options)
@@ -32,4 +32,9 @@ end
 desc "This task is called by the Heroku scheduler add-on - enriching listings attributes by matching description"
 task :enrich_listings_attributes => :environment do
   EnrichListingsAttributesWorker.perform_async
+end
+
+desc "This task is called by the Heroku scheduler add-on - enriching listings attributes by matching description"
+task :send_alert_emails => :environment do
+  AddPropertyToAlertsWorker.perform_async
 end
