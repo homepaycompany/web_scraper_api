@@ -10,7 +10,7 @@ class SendAllAlertsWorker
         livable_size_sqm: [alert.min_size_sqm..alert.max_size_sqm],
         price_per_sqm: [alert.min_price_per_sqm..alert.max_price_per_sqm]
       ).each do |property|
-        PropertyAlert.create(alert: alert, property: property) unless alert.user.properties.inlude?(property)
+        PropertyAlert.create(alert: alert, property: property) unless alert.user.properties.include?(property)
       end
     end
     User.all.each do |user|
