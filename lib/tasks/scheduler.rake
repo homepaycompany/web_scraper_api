@@ -35,6 +35,6 @@ task :enrich_listings_attributes => :environment do
 end
 
 desc "This task is called by the Heroku scheduler add-on - enriching listings attributes by matching description"
-task :send_alert_emails => :environment do
-  AddPropertyToAlertsWorker.perform_async
+task :send_all_alerts_emails => :environment do
+  SendAllAlertsWorker.perform_async
 end

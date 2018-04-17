@@ -2,6 +2,7 @@ class User < ApplicationRecord
   # Send email after user registration
   after_create :send_welcome_email
   has_many :alerts
+  has_many :properties, through: :alerts
   has_many :property_alerts, through: :alerts
 
   # Devise setup

@@ -9,12 +9,13 @@ class UserMailer < ApplicationMailer
     @user = user
     @alerts_and_properties = {}
     alerts.each do |alert|
-      @alerts_and_properties[alert.name] = alert.properties_to_send unless alert.properties_to_send.empty?
+      @alerts_and_properties[alert] = alert.properties_to_send unless alert.properties_to_send.empty?
     end
 
     mail(to: @user.email, subject: 'Prosper / Nouvelles annonces immobilières')
 
     alerts.each do |alert|
+      alert.update(last_sent_date: Time.now)
       alert.property_alerts_to_send.each do |e|
         e.update(status: 'sent')
       end

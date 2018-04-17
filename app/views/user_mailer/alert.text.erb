@@ -2,15 +2,18 @@ Bonjour <%= @user.first_name %>,
 
 Nous avons identifié des annonces immobilières qui pourraient vous intéresser :
 
-<% @alerts_and_properties.each do |name, properties| %>
-  <% properties.each do |property| %>
-    <%= property.name %>
-    Prix : <%= property.price %>€ <%= "(#{property.price_per_sqm}€/m²)" if property.price_per_sqm %>
-    Surface : <%= property.livable_size_sqm %>m²
-    <% if property.address %>
-      <%= property.address.split.map(&:capitalize).join(' ') %>
-    <% else %>
-      <%= property.city.split.map(&:capitalize).join(' ') %>
+<% @alerts_and_properties.each do |alert, properties| %>
+<p>Alerte - <%= alert.name %></p>
+  <% unless properties.nil? %>
+    <% properties.each do |property| %>
+      <%= property.name %>
+      Prix : <%= property.price %>€ <%= "(#{property.price_per_sqm}€/m²)" if property.price_per_sqm %>
+      Surface : <%= property.livable_size_sqm %>m²
+      <% if property.address %>
+        <%= property.address.split.map(&:capitalize).join(' ') %>
+      <% else %>
+        <%= property.city.split.map(&:capitalize).join(' ') %>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

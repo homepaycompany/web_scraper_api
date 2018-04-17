@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180417075555) do
+ActiveRecord::Schema.define(version: 20180417100907) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 20180417075555) do
     t.float "min_price_per_sqm", default: 0.0
     t.float "max_price_per_sqm", default: 999999999.0
     t.string "name"
+    t.date "last_sent_date"
     t.index ["user_id"], name: "index_alerts_on_user_id"
   end
 
@@ -84,7 +85,6 @@ ActiveRecord::Schema.define(version: 20180417075555) do
     t.date "attributes_enriched_at"
     t.date "location_enriched_at"
     t.float "price_per_sqm"
-    t.boolean "need_to_add_to_alerts", default: true
   end
 
   create_table "property_alerts", force: :cascade do |t|
