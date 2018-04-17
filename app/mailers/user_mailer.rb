@@ -5,9 +5,19 @@ class UserMailer < ApplicationMailer
     mail(to: @user.email, subject: 'Bienvenue sur Prosper')
   end
 
-  def alert(user)
+  def alert(user, alerts)
     @user = user
-    @properties = Property.last(3)
-    mail(to: @user.email, subject: 'Proper / Nouvelles annonces immobilières')
+    @alerts_and_properties = {}
+    alerts.each do |alert|
+      @alerts_and_properties[alert.name] = alert.properties_to_send unless alert.properties_to_send.empty?
+    end
+
+    mail(to: @user.email, subject: 'Prosper / Nouvelles annonces immobilières')
+
+    alerts.each do |alert|
+      alert.property_alerts_to_send.each do |e|
+        e.update(status: 'sent')
+      end
+    end
   end
 end

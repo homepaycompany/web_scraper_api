@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180416181959) do
+ActiveRecord::Schema.define(version: 20180417075555) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,12 +20,13 @@ ActiveRecord::Schema.define(version: 20180416181959) do
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.string "city"
-    t.integer "min_price"
-    t.integer "max_price"
-    t.integer "min_size_sqm"
-    t.integer "max_size_sqm"
-    t.float "min_price_per_sqm"
-    t.float "max_price_per_sqm"
+    t.integer "min_price", default: 0
+    t.integer "max_price", default: 999999999
+    t.integer "min_size_sqm", default: 0
+    t.integer "max_size_sqm", default: 999999999
+    t.float "min_price_per_sqm", default: 0.0
+    t.float "max_price_per_sqm", default: 999999999.0
+    t.string "name"
     t.index ["user_id"], name: "index_alerts_on_user_id"
   end
 
@@ -91,6 +92,7 @@ ActiveRecord::Schema.define(version: 20180416181959) do
     t.bigint "alert_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status", default: "to_send"
     t.index ["alert_id"], name: "index_property_alerts_on_alert_id"
     t.index ["property_id"], name: "index_property_alerts_on_property_id"
   end
