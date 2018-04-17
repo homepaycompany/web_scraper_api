@@ -3,6 +3,7 @@ class AddPropertyToAlertsWorker
 
   def perform
     Property.where(need_to_add_to_alerts: true).each do |property|
+      p "Adding property - #{property.id}"
       add_property_to_alerts(property)
       property.update(need_to_add_to_alerts: false)
     end
