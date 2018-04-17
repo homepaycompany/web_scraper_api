@@ -2,7 +2,7 @@ class UserMailer < ApplicationMailer
 
   def welcome(user)
     @user = user
-    mail(to: @user.email, subject: 'Bienvenue sur Prosper')
+    mail(to: @user.email, subject: 'Bienvenue sur Homepay')
   end
 
   def alert(user, alerts)

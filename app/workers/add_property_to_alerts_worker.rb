@@ -13,7 +13,7 @@ class AddPropertyToAlertsWorker
 
   def add_property_to_alerts(property)
     Alert.where(
-      city: property.search_location,
+      city: property.city,
       min_price: [0..property.price],
       max_price: [property.price..999999999],
       min_size_sqm: [0..property.livable_size_sqm],
