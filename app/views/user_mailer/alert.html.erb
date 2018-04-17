@@ -2,31 +2,37 @@
 
 <p style="font-style: EB Garamond;">Nous avons identifié des annonces immobilières qui pourraient vous intéresser :</p>
 
-<% @properties.each do |property| %>
-  <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-    <div style="margin-bottom: 10px;">
-      <%= link_to property.name, property.urls, style: 'color: #20E8B6; text-decoration: none; font-weight: 800; margin: 0px 0px 10px 0px;' %>
-      <p style="margin: 0px 0px 10px 0px; font-weight: 800;">
-        Prix : <%= property.price %>€ <%= "(#{property.price_per_sqm}€/m²)" if property.price_per_sqm %>
-      </p>
-      <p style="margin: 0px 0px 10px 0px;">
-        Surface : <%= property.livable_size_sqm %>m²
-      </p>
-      <p style="margin: 0px 0px 10px 0px;">
-        <% if property.address %>
-          <%= property.address.split.map(&:capitalize).join(' ') %>
-        <% else %>
-          <%= property.city.split.map(&:capitalize).join(' ') %>
-        <% end %>
-      </p>
-      <% if property.latitude && property.longitude %>
-        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.latitude},#{property.longitude}&zoom=12&size=400x200&markers=color:red%7C#{property.latitude},#{property.longitude}&key=#{ENV['GOOGLE_API_BROWSER_KEY']}" %>
-      <% elsif property.city %>
-        <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.city}&markers=color:red%7C#{property.city}&zoom=12&size=400x200&key=#{ENV['GOOGLE_API_BROWSER_KEY']}" %>
-      <% end %>
-    </div>
-  </div>
+<% @alerts_and_properties.each do |name, properties| %>
+  <p style="font-style: EB Garamond;">Alerte - <%= name %></p>
+  <% unless properties.nil? %>
+    <% properties.each do |property| %>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+        <div style="margin-bottom: 10px;">
+          <%= link_to property.name, property.urls, style: 'color: #20E8B6; text-decoration: none; font-weight: 800; margin: 0px 0px 10px 0px;', target: :blank %>
+          <p style="margin: 0px 0px 10px 0px; font-weight: 800;">
+            Prix : <%= property.price %>€ <%= "(#{property.price_per_sqm}€/m²)" if property.price_per_sqm %>
+          </p>
+          <p style="margin: 0px 0px 10px 0px;">
+            Surface : <%= property.livable_size_sqm %>m²
+          </p>
+          <p style="margin: 0px 0px 10px 0px;">
+            <% if property.address %>
+              <%= property.address.split.map(&:capitalize).join(' ') %>
+            <% else %>
+              <%= property.city.split.map(&:capitalize).join(' ') %>
+            <% end %>
+          </p>
+          <% if property.latitude && property.longitude %>
+            <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.latitude},#{property.longitude}&zoom=12&size=400x200&markers=color:red%7C#{property.latitude},#{property.longitude}&key=#{ENV['GOOGLE_API_SERVER_KEY']}" %>
+          <% elsif property.city %>
+            <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.city}&markers=color:red%7C#{property.city}&zoom=12&size=400x200&key=#{ENV['GOOGLE_API_SERVER_KEY']}" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
 <% end %>
+
 
 <p style="font-style: EB Garamond;">Si vous avez des questions, n'hésitez pas à nous contacter sur
   <%= mail_to "contact@helloprosper.fr", "contact@helloprosper.fr", style: 'color: #20E8B6; text-decoration: none' %></p>

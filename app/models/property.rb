@@ -1,6 +1,7 @@
 class Property < ApplicationRecord
   require 'fuzzy_match'
   require 'amatch'
+  has_many :property_alerts
   before_create :calculate_price_per_sqm!
   FuzzyMatch.engine = :amatch
   geocoded_by :address
