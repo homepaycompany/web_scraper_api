@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: 'contact@helloprosper.fr'
+  default from: 'guillaume@homepay.fr'
   layout 'mailer'
 end
