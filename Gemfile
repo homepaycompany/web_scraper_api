@@ -6,7 +6,7 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-
+gem 'derailed_benchmarks', group: :development
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.5'
 # Use postgresql as the database for Active Record
@@ -31,9 +31,6 @@ gem "pundit"
 # Using sidekiq to handle job queues
 gem 'sidekiq'
 gem 'sidekiq-failures', '~> 1.0'
-
-# Using searchKick for listing matching
-gem 'searchkick', '~> 2.3'
 
 # Using fuzzy match, amatch, ruby ngrams and pg_search for deduplication and matching
 gem 'fuzzy_match', '~> 2.1'
