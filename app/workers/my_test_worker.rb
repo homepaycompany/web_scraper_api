@@ -7,7 +7,7 @@ class MyTestWorker
 
   def test_method
     a = []
-    1000000.times do
+    100000000.times do
       a << 1
     end
   end
