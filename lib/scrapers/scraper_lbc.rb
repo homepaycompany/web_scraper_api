@@ -230,7 +230,7 @@ class Scrapers::ScraperLbc
 
   def get_city!(listing, ad)
     begin
-      listing[:city] = ad['location']['city_label']
+      listing[:city] = ad['location']['city_label'].downcase
     rescue
       p 'Error - no city'
     end
