@@ -16,11 +16,11 @@ class ScrapWorker
     # Get listings URLs and Prices
     all_urls_and_prices = @scraper.get_listings_urls_and_prices(search_params)
     p "------- #{all_urls_and_prices.length} URLS ---------"
-    # Check what listings are new, have been updated or closed
+    # # Check what listings are new, have been updated or closed
     # listings = Property.filter_listings(all_urls_and_prices, search_params)
-    p "NEW : #{listings[:new].length} "
-    p "UPDATED : #{listings[:updated].length} "
-    p "CLOSED : #{listings[:closed].length} "
+    # p "NEW : #{listings[:new].length} "
+    # p "UPDATED : #{listings[:updated].length} "
+    # p "CLOSED : #{listings[:closed].length} "
     # # Close listings that have been closed
     # close_listings(listings[:closed])
     # # Update listings that have been updated
