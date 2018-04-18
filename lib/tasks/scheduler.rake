@@ -8,7 +8,7 @@ task :scrap_listings_toulouse => :environment do
       max_price: 100000
     }
   }
-  ScrapWorker.perform_async(options)
+  ScrapListingsJob.perform_later(options)
 end
 
 desc "This task is called by the Heroku scheduler add-on - scrapping listings in Paris"
