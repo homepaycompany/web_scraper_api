@@ -1,4 +1,4 @@
-class EnrichListingsLocationWorker
+class MyTestWorker
   include Sidekiq::Worker
   def perform
     a = []
