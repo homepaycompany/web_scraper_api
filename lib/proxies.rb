@@ -1,12 +1,14 @@
 module Proxies
   class Proxy
+    require 'open-uri'
+    require 'nokogiri'
 
     def initialize
       @proxies = []
       @proxy = ''
       @proxy_usage = 0
       @proxy_max_usage = 1000
-      scrap_proxies
+      # scrap_proxies
     end
 
     def open_url(url)
