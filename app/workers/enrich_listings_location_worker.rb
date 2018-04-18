@@ -26,37 +26,37 @@ class EnrichListingsLocationWorker
           z = s.index (/#{point_sanithized}/i)
           if z
             r[type][point] = z
-          else
-            trigrams = point_sanithized.trigrams.map { |t| t.join }
-            trigrams[0..(trigrams.length / 2) + 1].each_with_index do |t, i|
-              t_matches = []
-              u = -1
-              while u && u + 2 < s.length - 1
-                q = u
-                u = s[u + 1..s.length - 1].index(/#{t}/i)
-                if u
-                  u += q + 1
-                  t_matches << u
-                end
-              end
-              g = 0
-              while !t_matches.empty? && g < trigrams.length * 0.8
-                trigrams[i + 1..trigrams.length - 1].each_with_index do |trig, j|
-                  t_min = [t_matches.first + 1 + j, s.length - 1].min
-                  t_max = [t_matches.first + 5 + j, s.length - 1].min
-                   m = s[t_min..t_max].index(/#{trig}/i)
-                   if m
-                    g += 1
-                   end
-                end
-                if g >= trigrams.length * 0.8
-                  r[type][point] ||= t_matches.first
-                else
-                  t_matches.shift
-                  g = 0
-                end
-              end
-            end
+          # else
+          #   trigrams = point_sanithized.trigrams.map { |t| t.join }
+          #   trigrams[0..(trigrams.length / 2) + 1].each_with_index do |t, i|
+          #     t_matches = []
+          #     u = -1
+          #     while u && u + 2 < s.length - 1
+          #       q = u
+          #       u = s[u + 1..s.length - 1].index(/#{t}/i)
+          #       if u
+          #         u += q + 1
+          #         t_matches << u
+          #       end
+          #     end
+          #     g = 0
+          #     while !t_matches.empty? && g < trigrams.length * 0.8
+          #       trigrams[i + 1..trigrams.length - 1].each_with_index do |trig, j|
+          #         t_min = [t_matches.first + 1 + j, s.length - 1].min
+          #         t_max = [t_matches.first + 5 + j, s.length - 1].min
+          #          m = s[t_min..t_max].index(/#{trig}/i)
+          #          if m
+          #           g += 1
+          #          end
+          #       end
+          #       if g >= trigrams.length * 0.8
+          #         r[type][point] ||= t_matches.first
+          #       else
+          #         t_matches.shift
+          #         g = 0
+          #       end
+          #     end
+          #   end
           end
         end
       end

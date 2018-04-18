@@ -57,13 +57,17 @@ module Proxies
     def scrap_proxies
       urls = ['https://free-proxy-list.net','https://sslproxies.org']
       urls.each do |url|
-        html_file = open(url).read
-        html_doc = Nokogiri::HTML(html_file)
-        table = html_doc.search('#proxylisttable').first
-        table.search('tbody').first.search('tr').each do |r|
-          c = r.search('td')
-          proxy = URI.parse("http://#{c[0].text}:#{c[1].text}")
-          @proxies << proxy unless @proxies.include?(proxy)
+        begin
+          html_file = open(url).read
+          html_doc = Nokogiri::HTML(html_file)
+          table = html_doc.search('#proxylisttable').first
+          table.search('tbody').first.search('tr').each do |r|
+            c = r.search('td')
+            proxy = URI.parse("http://#{c[0].text}:#{c[1].text}")
+            @proxies << proxy unless @proxies.include?(proxy)
+          end
+        rescue
+          p 'Error while connecting to Proxy list'
         end
       end
     end
