@@ -100,7 +100,7 @@ class Scrapers::ScraperLbc
         query += "&#{@query_params[k][:query]}=#{v}"
       end
     end
-    url = @base_search_url + query
+    url = "#{@base_search_url}#{query}"
   end
 
   def has_listings?(html_doc)

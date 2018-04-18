@@ -1,5 +1,5 @@
 class Scrapers::ScraperDispatch
-  include Proxies
+  # include Proxies
 
   def initialize(website)
     @proxy = Proxies::Proxy.new

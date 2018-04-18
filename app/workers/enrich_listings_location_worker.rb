@@ -2,8 +2,8 @@
 # interest by matching the listing's name + description to the points of interest list
 class EnrichListingsLocationWorker
   include Sidekiq::Worker
-  include Loaders
-  include RegexMatchers
+  # include Loaders
+  # include RegexMatchers
 
   def perform
     @loader = Loaders::LoaderPointsOfInterest.new()

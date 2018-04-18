@@ -1,6 +1,6 @@
 class EnrichListingsAttributesWorker
   include Sidekiq::Worker
-  include RegexMatchers
+  # include RegexMatchers
 
   def perform
     regex_matcher = RegexMatchers::MatcherListingAttributes.new()
