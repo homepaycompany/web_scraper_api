@@ -4,9 +4,10 @@ class ScrapWorker
   def perform(options)
     options = options.symbolize_keys
     search_params = options[:search_params].symbolize_keys
-    if search_params[:search_location]
+    options[:cities].each do |city|
       @scraper = Scrapers::ScraperDispatch.new(options[:website])
-      scrap_logic(search_params)
+      scrap_logic(search_params.merge(search_location: city))
+      GC.start
     end
   end
 
@@ -65,7 +66,7 @@ class ScrapWorker
 
   def create_listings(listings, search_params = {})
     p '------- CREATING LISTINGS --------'
-    listings[0..100].each_with_index do |l,i|
+    listings[0..5].each_with_index do |l,i|
       p "CREATING : #{i + 1} / #{listings.length}"
       prop = @scraper.scrap_one_listing(l[:url])
       params = prop.merge(urls: l[:url],

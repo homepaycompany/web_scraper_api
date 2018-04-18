@@ -1,21 +1,9 @@
 desc "This task is called by the Heroku scheduler add-on - scrapping listings in toulouse"
-task :scrap_listings_toulouse => :environment do
-  options = {website: 'lbc',
+task :scrap_listings => :environment do
+  options = {
+    website: 'lbc',
+    cities: ['toulouse', 'paris', 'boulogne-billancourt'],
     search_params: {
-      search_location: 'toulouse',
-      property_type: ['house', 'appartment'],
-      min_price: 100000,
-      max_price: 125000
-    }
-  }
-  ScrapWorker.perform_async(options)
-end
-
-desc "This task is called by the Heroku scheduler add-on - scrapping listings in Paris"
-task :scrap_listings_paris => :environment do
-  options = {website: 'lbc',
-    search_params: {
-      search_location: 'paris',
       property_type: ['house', 'appartment'],
       min_price: 100000,
       max_price: 1000000
@@ -34,7 +22,7 @@ task :enrich_listings_attributes => :environment do
   EnrichListingsAttributesWorker.perform_async
 end
 
-desc "This task is called by the Heroku scheduler add-on - enriching listings attributes by matching description"
+desc "This task is called by the Heroku scheduler add-on - check if there are alerts and send them to the users"
 task :send_all_alerts_emails => :environment do
   SendAllAlertsWorker.perform_async
 end
