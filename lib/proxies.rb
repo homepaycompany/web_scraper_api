@@ -1,7 +1,5 @@
 module Proxies
   class Proxy
-    require 'open-uri'
-    require 'nokogiri'
 
     def initialize
       @proxies = []
@@ -12,6 +10,13 @@ module Proxies
     end
 
     def open_url(url)
+      t = Time.now
+      html_file = open(url).read
+      p "open url: #{Time.now - t}"
+      return Nokogiri::HTML(html_file)
+    end
+
+    def out_open_url(url)
       t = Time.now
       html_file = nil
       try = 1
@@ -33,7 +38,7 @@ module Proxies
           end
         rescue => error
           p "proxy failed - #{error}"
-          next_proxy
+          delete_proxy
           try += 1
         end
       end
@@ -72,6 +77,10 @@ module Proxies
       proxy = @proxies.shift
       @proxies << proxy
       @proxy_usage = 0
+    end
+
+    def delete_proxy
+      @proxies.shift
     end
   end
 end

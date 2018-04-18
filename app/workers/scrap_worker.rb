@@ -1,7 +1,5 @@
 class ScrapWorker
   include Sidekiq::Worker
-  # include Scrapers
-
 
   def perform(options)
     options = options.symbolize_keys

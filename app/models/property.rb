@@ -1,6 +1,4 @@
 class Property < ApplicationRecord
-  require 'fuzzy_match'
-  require 'amatch'
   has_many :property_alerts
   before_create :calculate_price_per_sqm!
   include PgSearch
@@ -37,15 +35,6 @@ class Property < ApplicationRecord
 
   def self.listings_open_urls_prices_and_ids(search_params = {})
     a = {}
-    # self.all.select{ |l|
-    #   l.status != 'closed' &&
-    #   l.search_location == search_params[:search_location] &&
-    #   (search_params[:min_price]..search_params[:max_price]).include?(l.price)
-    #   }.each do |l|
-    #   l.urls_array.each do |u|
-    #     a[u] = {price: l.price, id: l.id}
-    #   end
-    # end
     self.where(
       search_location: search_params[:search_location],
       price: search_params[:min_price]..search_params[:max_price],
@@ -74,8 +63,7 @@ class Property < ApplicationRecord
       if temp[:location_type] == 'address'
         temp.reverse_geocode
       end
-      # prop = self.check_for_duplicate(temp)
-      prop = nil
+      prop = self.check_for_duplicate(temp)
       if prop
         p '-- Duplicate found'
         prop.update_listing(temp.attributes)
