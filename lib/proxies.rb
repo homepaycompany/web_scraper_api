@@ -8,17 +8,10 @@ module Proxies
       @proxy = ''
       @proxy_usage = 0
       @proxy_max_usage = 1000
-      # scrap_proxies
+      scrap_proxies
     end
 
     def open_url(url)
-      t = Time.now
-      html_file = open(url).read
-      p "open url: #{Time.now - t}"
-      return Nokogiri::HTML(html_file)
-    end
-
-    def out_open_url(url)
       t = Time.now
       html_file = nil
       try = 1
