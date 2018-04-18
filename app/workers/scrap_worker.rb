@@ -1,7 +1,6 @@
 class ScrapWorker
   include Sidekiq::Worker
   include Scrapers
-  include Loaders
 
 
   def perform(options)

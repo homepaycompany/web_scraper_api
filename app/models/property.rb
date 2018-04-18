@@ -3,9 +3,15 @@ class Property < ApplicationRecord
   require 'amatch'
   has_many :property_alerts
   before_create :calculate_price_per_sqm!
+  include PgSearch
   FuzzyMatch.engine = :amatch
   geocoded_by :address
   reverse_geocoded_by :latitude, :longitude
+  pg_search_scope :search_by_description,
+    against: [ :name, :description],
+    using: {
+      tsearch: { prefix: true }
+  }
 
   # Gets a hash of listings structured as an url and a price and returns a hash with 3 arrays
   # new: array with hashs of urls to scrap

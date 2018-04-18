@@ -35,10 +35,11 @@ gem 'sidekiq-failures', '~> 1.0'
 # Using searchKick for listing matching
 gem 'searchkick', '~> 2.3'
 
-# Using fuzzy match and amatch to deduplicate listings based on description
+# Using fuzzy match, amatch, ruby ngrams and pg_search for deduplication and matching
 gem 'fuzzy_match', '~> 2.1'
 gem 'amatch', '~> 0.3.0'
 gem 'ruby_ngrams', '~> 0.0.6'
+gem 'pg_search'
 
 # Geocoding listings with google geocoder gem
 gem "geocoder"
