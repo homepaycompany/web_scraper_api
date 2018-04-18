@@ -19,6 +19,7 @@ class Scrapers::ScraperDispatch
     if @scraper.has_listings?(page_1)
       all_urls_and_prices.merge!(@scraper.get_listings_urls_and_prices(page_1))
       pages_numbers = @scraper.get_all_pages_numbers(page_1, 1)
+      page_1 = nil
       while !pages_numbers.empty?
         # build url, scrap pages number and add to array if necessary, and merge page listings with prices & urls
         n = pages_numbers.first
@@ -28,6 +29,7 @@ class Scrapers::ScraperDispatch
         all_urls_and_prices.merge!(@scraper.get_listings_urls_and_prices(page_n))
         pages_numbers.flatten!.uniq!
         pages_numbers.shift
+        page_n = nil
       end
 
       return all_urls_and_prices
