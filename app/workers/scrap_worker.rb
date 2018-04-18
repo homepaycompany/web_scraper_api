@@ -8,6 +8,7 @@ class ScrapWorker
       @scraper = Scrapers::ScraperDispatch.new(options[:website])
       scrap_logic(search_params)
     end
+    GC.start
   end
 
   private
