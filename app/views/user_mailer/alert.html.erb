@@ -1,4 +1,4 @@
-<p style="font-style: EB Garamond;">Bonjour <%= @user.first_name %>,</p>
+<p style="font-style: EB Garamond;">Bonjour <%= @user.first_name.capitalize %>,</p>
 
 <p style="font-style: EB Garamond;">Nous avons identifié des annonces immobilières qui pourraient vous intéresser :</p>
 
@@ -34,10 +34,6 @@
     <% end %>
   <% end %>
 <% end %>
-
-
-<p style="font-style: EB Garamond;">Si vous avez des questions, n'hésitez pas à nous contacter sur
-  <%= mail_to "contact@helloprosper.fr", "contact@helloprosper.fr", style: 'color: #20E8B6; text-decoration: none' %></p>
 
 <p style="font-style: EB Garamond;">Bonne journée,</p>
 
