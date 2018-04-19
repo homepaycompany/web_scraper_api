@@ -12,7 +12,6 @@ Rails.application.routes.draw do
   # Routes for tracking clicks on properties
   get "tracking/:alert_id/:property_id", to: "tracking#redirect_to_listing"
 
-
   # Sidekiq Web UI, only for admins.
   require "sidekiq/web"
   authenticate :user, lambda { |u| u.admin } do
