@@ -5,6 +5,7 @@ class SendAllAlertsWorker
     Alert.all.select { |e| e.last_sent_date.nil? || e.last_sent_date < Date.today }.each do |alert|
       Property.where(
         status: 'open',
+        lifetime_annuity: false,
         city: alert.city.downcase,
         price: [alert.min_price..alert.max_price],
         livable_size_sqm: [alert.min_size_sqm..alert.max_size_sqm],
