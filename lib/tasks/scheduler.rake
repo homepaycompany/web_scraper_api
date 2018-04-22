@@ -2,7 +2,7 @@ desc "This task is called by the Heroku scheduler add-on - scrapping listings in
 task :scrap_listings => :environment do
   options = {
     website: 'lbc',
-    cities: ['toulouse'],
+    cities: ['toulouse', 'paris', 'boulogne-billancourt'],
     search_params: {
       property_type: ['house', 'appartment'],
       min_price: 100000,

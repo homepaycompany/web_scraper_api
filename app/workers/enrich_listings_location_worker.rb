@@ -2,14 +2,12 @@
 # interest by matching the listing's name + description to the points of interest list
 class EnrichListingsLocationWorker
   include Sidekiq::Worker
-  # include Loaders
-  # include RegexMatchers
 
   def perform
     @loader = Loaders::LoaderPointsOfInterest.new()
     @regex_matcher = RegexMatchers::MatcherListingLocation.new()
     properties = Property.where(need_to_enrich_location: true).where(search_location: 'paris')
-    properties.each do |property|
+    properties[0..5].each do |property|
       add_point_of_interest(property)
     end
   end
@@ -26,37 +24,6 @@ class EnrichListingsLocationWorker
           z = s.index (/#{point_sanithized}/i)
           if z
             r[type][point] = z
-          # else
-          #   trigrams = point_sanithized.trigrams.map { |t| t.join }
-          #   trigrams[0..(trigrams.length / 2) + 1].each_with_index do |t, i|
-          #     t_matches = []
-          #     u = -1
-          #     while u && u + 2 < s.length - 1
-          #       q = u
-          #       u = s[u + 1..s.length - 1].index(/#{t}/i)
-          #       if u
-          #         u += q + 1
-          #         t_matches << u
-          #       end
-          #     end
-          #     g = 0
-          #     while !t_matches.empty? && g < trigrams.length * 0.8
-          #       trigrams[i + 1..trigrams.length - 1].each_with_index do |trig, j|
-          #         t_min = [t_matches.first + 1 + j, s.length - 1].min
-          #         t_max = [t_matches.first + 5 + j, s.length - 1].min
-          #          m = s[t_min..t_max].index(/#{trig}/i)
-          #          if m
-          #           g += 1
-          #          end
-          #       end
-          #       if g >= trigrams.length * 0.8
-          #         r[type][point] ||= t_matches.first
-          #       else
-          #         t_matches.shift
-          #         g = 0
-          #       end
-          #     end
-          #   end
           end
         end
       end
@@ -64,32 +31,46 @@ class EnrichListingsLocationWorker
       p "Error - Couldn't match property"
     end
     begin
-      latitude = nil
-      if !r[:street].empty?
+      city_coords = Geocoder.coordinates(property.city)
+      i = false
+      j = false
+      while !r[:street].empty? && !i
+        p 'iterating street'
         m = r[:street].min_by { |k,v| v }.first
-        address = points_of_interest[:street][m][:full_name]
-        if points_of_interest[:street][m][:latitude]
-          latidude = points_of_interest[:street][m][:latitude]
-          longidude = points_of_interest[:street][m][:longitude]
+        point_hash = validate_point_of_interest!(points_of_interest, point_of_interest_coords, city_coords, m, address, 'street')
+        if point_hash
+          address = point_hash.keys.first
+          point_of_interest_coords = point_hash.values.first
+          i = true
+        else
+          r[:street].delete(m)
+          m = nil
         end
-      elsif !r[:area].empty?
+      end
+      while !r[:area].empty? && !i && !j
+        p 'iterating area'
         m = r[:area].min_by { |k,v| v }.first
-        address = points_of_interest[:area][m][:full_name]
-        if points_of_interest[:area][m][:latitude]
-          latidude = points_of_interest[:area][m][:latitude]
-          longidude = points_of_interest[:area][m][:longitude]
+        point_hash = validate_point_of_interest!(points_of_interest, point_of_interest_coords, city_coords, m, address, 'area')
+        if point_hash
+          address = point_hash.keys.first
+          point_of_interest_coords = point_hash.values.first
+          j = true
+        else
+          r[:area].delete(m)
+          m = nil
         end
       end
       if m
         p m
+        p point_of_interest_coords
+        p address
         property.address = address
         property.location_type = 'point_of_interest'
-      end
-      if !latitude.nil?
-        property.latitude = latidude
-        property.longitude = longitude
+        property.latitude = point_of_interest_coords[0]
+        property.longitude = point_of_interest_coords[1]
       else
-        property.geocode
+        property.latitude = city_coords[0]
+        property.longitude = city_coords[1]
       end
       property.need_to_enrich_location = false
       property.location_enriched_at = Time.now
@@ -100,6 +81,21 @@ class EnrichListingsLocationWorker
       property.save
     rescue
       p 'Error - property location could not be enriched'
+    end
+  end
+
+  def validate_point_of_interest!(points_of_interest, point_of_interest_coords, city_coords, m, address, type)
+    point = points_of_interest[type.to_sym][m]
+    address = point[:full_name]
+    if point[:latitude]
+      point_of_interest_coords = [point[:latitude], point[:longitude]]
+    else
+      point_of_interest_coords = Geocoder.coordinates(address)
+    end
+    if Geocoder::Calculations.distance_between(city_coords, point_of_interest_coords) < 800
+      {address => point_of_interest_coords}
+    else
+      return false
     end
   end
 end

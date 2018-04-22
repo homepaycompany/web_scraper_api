@@ -53,6 +53,12 @@ class RegexMatchers::MatcherListingAttributes
         ]
       },
       {
+        field: :lifetime_annuity,
+        regex: [
+          "viagers*","viagés*","viages*","viajers*"
+        ]
+      },
+      {
         field: :has_balcony,
         match_field: :size_balcony_sqm,
         regex: [
