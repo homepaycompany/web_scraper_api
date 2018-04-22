@@ -89,7 +89,7 @@ class Property < ApplicationRecord
       end
     end
     if search_params[:price] && search_params[:price]!= self.price
-      self.price = search_params[k]
+      self.price = search_params[:price]
       self.all_prices = self.all_prices + ",#{search_params[:price]}"
       self.status = 'updated'
       self.all_updates = self.all_updates + "u-#{search_params[:posted_on] || Time.now.strftime('%d/%m/%Y')}"
@@ -133,8 +133,7 @@ class Property < ApplicationRecord
     l = Property.near([property.latitude, property.longitude], 10)
     search_params = {
       property_type: property.property_type,
-      livable_size_sqm: (property.livable_size_sqm - 1)..(property.livable_size_sqm + 1),
-      price: property.price*0.8..property.price*1.2
+      livable_size_sqm: (property.livable_size_sqm - 2)..(property.livable_size_sqm + 2),
     }
     a = l.where(search_params)
     r = FuzzyMatch.new(a, :read => :description).find(property.description)
