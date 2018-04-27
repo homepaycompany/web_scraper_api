@@ -7,7 +7,7 @@ class EnrichListingsLocationWorker
     @loader = Loaders::LoaderPointsOfInterest.new()
     @regex_matcher = RegexMatchers::MatcherListingLocation.new()
     properties = Property.where(need_to_enrich_location: true).where(search_location: 'paris')
-    properties[0..5].each do |property|
+    properties.each do |property|
       add_point_of_interest(property)
     end
   end
@@ -32,6 +32,8 @@ class EnrichListingsLocationWorker
     end
     begin
       city_coords = Geocoder.coordinates(property.city)
+      point_of_interest_coords = []
+      address = ''
       i = false
       j = false
       while !r[:street].empty? && !i
@@ -61,8 +63,6 @@ class EnrichListingsLocationWorker
         end
       end
       if m
-        p m
-        p point_of_interest_coords
         p address
         property.address = address
         property.location_type = 'point_of_interest'
