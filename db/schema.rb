@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180422143556) do
+ActiveRecord::Schema.define(version: 20180430132427) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -94,6 +94,7 @@ ActiveRecord::Schema.define(version: 20180422143556) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "status", default: "to_send"
+    t.integer "user_id"
     t.index ["alert_id"], name: "index_property_alerts_on_alert_id"
     t.index ["property_id"], name: "index_property_alerts_on_property_id"
   end
