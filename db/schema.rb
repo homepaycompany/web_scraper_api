@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180430132427) do
+ActiveRecord::Schema.define(version: 20180502121646) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,6 +28,8 @@ ActiveRecord::Schema.define(version: 20180430132427) do
     t.float "max_price_per_sqm", default: 999999999.0
     t.string "name"
     t.date "last_sent_date"
+    t.integer "min_number_of_rooms", default: 0
+    t.integer "max_number_of_rooms", default: 999999999
     t.index ["user_id"], name: "index_alerts_on_user_id"
   end
 
