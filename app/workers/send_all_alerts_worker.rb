@@ -2,7 +2,7 @@ class SendAllAlertsWorker
   include Sidekiq::Worker
 
   def perform
-    Alert.all.select { |e| e.last_sent_date.nil? || e.last_sent_date < Date.today }.each do |alert|
+    Alert.all.each do |alert|
       Property.where(
         status: 'open',
         lifetime_annuity: false,
