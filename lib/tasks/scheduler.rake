@@ -26,3 +26,8 @@ desc "This task is called by the Heroku scheduler add-on - check if there are al
 task :send_all_alerts_emails => :environment do
   SendAllAlertsWorker.perform_async
 end
+
+desc "This task is called by the Heroku scheduler add-on - remove duplicate properties"
+task :remove_duplicate_properties => :environment do
+  RemoveDuplicatePropertiesWorker.perform_async
+end
