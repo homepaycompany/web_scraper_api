@@ -1,5 +1,5 @@
 class Property < ApplicationRecord
-  has_many :property_alerts
+  has_many :property_alerts, , dependent: :destroy
   before_create :calculate_price_per_sqm!
   include PgSearch
   FuzzyMatch.engine = :amatch
