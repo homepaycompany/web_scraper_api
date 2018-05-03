@@ -3,9 +3,10 @@ class RemoveDuplicatePropertiesWorker
 
   def perform
     duplicates = 0
-    Property.all.each do |property|
+    Property.where(need_to_check_for_duplicates: true).each do |property|
       begin
         prop = Property.check_for_duplicate(property)
+        property.update(need_to_check_for_duplicates: false)
         if prop
           duplicates += 1
           update_and_destroy_properties(property, prop)

@@ -75,10 +75,12 @@ class Property < ApplicationRecord
       end
     else
       p '-- Creating incomplete property'
-      Property.create(search_params.merge({
+      if Property.create(search_params.merge({
         all_prices: search_params[:price],
         all_updates: "c-#{search_params[:posted_on]}",
         status: 'incomplete'}))
+        p 'record created successfully'
+      end
     end
   end
 
@@ -109,7 +111,7 @@ class Property < ApplicationRecord
       self.urls = self.urls + ",#{search_params[:urls]}"
     end
     if self.save
-      p 'record updated'
+      p 'record updated successfully'
     end
   end
 
@@ -119,7 +121,7 @@ class Property < ApplicationRecord
     self.removed_on = Time.now.strftime("%d/%m/%Y")
     self.all_updates = all_updates
     if self.save
-      p 'record updated'
+      p 'record closed successfully'
     end
   end
 
