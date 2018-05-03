@@ -59,6 +59,16 @@ class RegexMatchers::MatcherListingAttributes
         ]
       },
       {
+        field: :is_residence,
+        regex: [
+          "r[e|é]sidences*(?:de| )*services*",
+          "les(?:de| )*hesp[e|é]rides",
+          "r[e|é]sidences*(?:de| )*s[e|é]nior*",
+          "r[e|é]sidences*(?:de| )*[e|é]tudiantes*",
+          "r[e|é]sidences*(?:pas|non| )*m[e|é]dical[iseés]*"
+        ]
+      },
+      {
         field: :has_balcony,
         match_field: :size_balcony_sqm,
         regex: [
@@ -142,7 +152,7 @@ class RegexMatchers::MatcherListingAttributes
   end
 
   def enrich_listing_attributes(listing)
-    s = "#{listing.name} #{listing.description}"
+    s = "#{listing.name.downcase} #{listing.description.downcase}"
     @fields.each do |f|
       result = match_fields(s, f)
       if result
