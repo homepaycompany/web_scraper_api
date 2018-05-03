@@ -83,25 +83,30 @@ class Property < ApplicationRecord
   end
 
   def update_listing(search_params = {})
+    search_params = search_params.symbolize_keys
     search_params.each do |k,v|
       if self.send(k).nil? && v
+        p "writing #{k} : #{v}"
         self.write_attribute(k,v)
       end
     end
     status_updated = false
     if search_params[:status] && search_params[:status]!= self.status
+      p "Status updated"
       self.status = 'updated'
       self.all_updates = self.all_updates + "u-#{search_params[:posted_on] || Time.now.strftime('%d/%m/%Y')}"
       status_updated = true
     end
     if search_params[:price] && search_params[:price]!= self.price
+      p "Price updated"
       self.price = search_params[:price]
       self.all_prices = self.all_prices + ",#{search_params[:price]}"
       self.status = 'updated'
       self.all_updates = self.all_updates + "u-#{search_params[:posted_on] || Time.now.strftime('%d/%m/%Y')}" unless status_updated
     end
-    if search_params[:url] && !self.urls_array.include?(search_params[:url])
-      self.urls = self.urls + ",#{search_params[:url]}"
+    if search_params[:urls] && !self.urls_array.include?(search_params[:urls])
+      p "url updated"
+      self.urls = self.urls + ",#{search_params[:urls]}"
     end
     if self.save
       p 'record updated'

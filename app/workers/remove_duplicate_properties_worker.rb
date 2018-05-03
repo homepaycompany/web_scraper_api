@@ -4,15 +4,18 @@ class RemoveDuplicatePropertiesWorker
   def perform
     duplicates = 0
     Property.all.each do |property|
-      prop = Property.check_for_duplicate(property)
-      if prop
-        duplicates += 1
-        update_and_destroy_properties(property, prop)
+      begin
+        prop = Property.check_for_duplicate(property)
+        if prop
+          duplicates += 1
+          update_and_destroy_properties(property, prop)
+        end
+      rescue
+        p 'Issue encountered while searching for duplicate'
       end
     end
     p "#{duplicates} duplicates found and destroyed"
   end
-
 
   def update_and_destroy_properties(property_1, property_2)
     # check which property is the latest, and add its information to the oldes one
@@ -26,5 +29,4 @@ class RemoveDuplicatePropertiesWorker
       property_1.destroy
     end
   end
-
 end
