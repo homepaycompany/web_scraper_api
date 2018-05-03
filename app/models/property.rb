@@ -130,7 +130,7 @@ class Property < ApplicationRecord
   # location and description, and if not then saves it in DB
   def self.check_for_duplicate(property)
     # Get relevant property attributes to be passed as search_params for the WHERE portion of the search
-    l = Property.near([property.latitude, property.longitude], 10)
+    l = Property.near(property.city, 10)
     search_params = {
       property_type: property.property_type,
       livable_size_sqm: (property.livable_size_sqm - 2)..(property.livable_size_sqm + 2),
