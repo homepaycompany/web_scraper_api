@@ -92,7 +92,7 @@ class EnrichListingsLocationWorker
     else
       point_of_interest_coords = Geocoder.coordinates(address)
     end
-    if Geocoder::Calculations.distance_between(city_coords, point_of_interest_coords) < 800
+    if Geocoder::Calculations.distance_between(city_coords, point_of_interest_coords) < 0.8
       {address => point_of_interest_coords}
     else
       return false
