@@ -4,7 +4,7 @@ class EnrichListingsAttributesWorker
 
   def perform
     regex_matcher = RegexMatchers::MatcherListingAttributes.new()
-    properties = Property.where(need_to_enrich_attributes: true)
+    properties = Property.where(need_to_enrich_attributes: true).where.not(status: 'incomplete')
     properties.each do |property|
       begin
         p property.id
