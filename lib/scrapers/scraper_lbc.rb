@@ -148,7 +148,7 @@ class Scrapers::ScraperLbc
           get_price!(listing, ad)
           get_postage_date!(listing, ad)
           get_attributes!(listing, ad)
-          get_city!(listing, ad)
+          get_city_and_zipcode!(listing, ad)
           get_location!(listing, ad)
           get_user_type!(listing, ad)
         end
@@ -228,11 +228,21 @@ class Scrapers::ScraperLbc
     end
   end
 
-  def get_city!(listing, ad)
+  def get_city_and_zipcode!(listing, ad)
     begin
-      listing[:city] = ad['location']['city_label'].downcase
+      match_data = ad['location']['city_label'].downcase.match(/([^\d]+)(\d+)/)
+      begin
+        listing[:city] = match_data[1].strip
+      rescue
+        p 'Error - no city'
+      end
+      begin
+        listing[:zipcode] = match_data[2]
+      rescue
+        p 'Error - no zipcode'
+      end
     rescue
-      p 'Error - no city'
+      p 'Error - no city and zipcode'
     end
   end
 

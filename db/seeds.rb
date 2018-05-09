@@ -27,3 +27,39 @@
 #     csv << row
 #   end
 # end
+
+p '=============== Cleaning Properties ==============='
+
+Property.all.each do |property|
+  if property.city
+    match_data = property.city.match(/([^\d]+)(\d+)/)
+    if match_data
+      property.city = match_data[1].strip
+      property.zipcode = match_data[2]
+      p "#{property.id} - #{property.city} : #{property.zipcode}"
+      property.save
+    end
+  end
+end
+
+p '=============== Cleaning ALERTS ==============='
+
+Alert.all.each do |alert|
+  if alert.city
+    match_data = alert.city.match(/(\d*)/)
+    if match_data
+      match_data[1].empty? ? alert.zipcode = nil : alert.zipcode = match_data[1]
+      p "#{alert.id} - #{alert.city} : #{alert.zipcode}"
+      alert.city = nil
+      alert.save
+    end
+  end
+end
+
+
+
+
+
+
+
+

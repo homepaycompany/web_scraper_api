@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180503163611) do
+ActiveRecord::Schema.define(version: 20180509155146) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 20180503163611) do
     t.date "last_sent_date"
     t.integer "min_number_of_rooms", default: 0
     t.integer "max_number_of_rooms", default: 999999999
+    t.integer "zipcode"
     t.index ["user_id"], name: "index_alerts_on_user_id"
   end
 
@@ -90,6 +91,7 @@ ActiveRecord::Schema.define(version: 20180503163611) do
     t.boolean "lifetime_annuity", default: false
     t.boolean "need_to_check_for_duplicates", default: true
     t.boolean "is_residence", default: false
+    t.integer "zipcode"
   end
 
   create_table "property_alerts", force: :cascade do |t|
