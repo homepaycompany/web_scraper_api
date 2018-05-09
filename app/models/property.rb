@@ -23,7 +23,7 @@ class Property < ApplicationRecord
     listings_hash.each do |k,v| # Iterate over each listing in the params
       if l.keys.include?(k) # Check if the url is already in DB, by looking if its url is already stored
         c.delete(l[k][:id]) # If the listing is already in DB, remove it from the Opened listings array
-        if l[k][:price] != v # And check if price has changed, if yes store the listing ID and New Price in the updated listings array
+        if !l[k][:prices_array].include?(v) # And check if price has changed, if yes store the listing ID and New Price in the updated listings array
           u << { id: l[k][:id], price: v }
         end
       else
@@ -42,7 +42,7 @@ class Property < ApplicationRecord
       status: 'closed'
     ).each do |l|
       l.urls_array.each do |u|
-        a[u] = {price: l.price, id: l.id}
+        a[u] = {prices_array: l.prices_array, id: l.id}
       end
     end
     return a
@@ -54,6 +54,14 @@ class Property < ApplicationRecord
     else
       return [self.urls]
     end
+  end
+
+  def prices_array
+    prices_array = []
+    self.all_prices.split(',').each do |price|
+      prices_array << price.to_i
+    end
+    return prices_array
   end
 
   # Perform check on a new listing : if already in DB then store the URL, if not then create a new Property
@@ -146,7 +154,8 @@ class Property < ApplicationRecord
     l = Property.near(property.city, 10)
     search_params = {
       property_type: property.property_type,
-      livable_size_sqm: (property.livable_size_sqm - 2)..(property.livable_size_sqm + 2),
+      livable_size_sqm: property.livable_size_sqm,
+      num_rooms: property.num_rooms
     }
     a = l.where(search_params).reject { |e| e == property}
     r = FuzzyMatch.new(a, :read => :description).find(property.description)
