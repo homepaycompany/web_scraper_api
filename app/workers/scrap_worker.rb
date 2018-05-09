@@ -27,7 +27,7 @@ class ScrapWorker
     # Update listings that have been updated
     update_listings(listings[:updated])
     # Scrap new listings
-    # create_listings(listings[:new], search_params)
+    create_listings(listings[:new], search_params)
   end
 
   def close_listings(listings)
