@@ -26,7 +26,7 @@
             <% if property.latitude && property.longitude %>
               <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.latitude},#{property.longitude}&zoom=12&size=400x200&markers=color:red%7C#{property.latitude},#{property.longitude}&key=#{ENV['GOOGLE_API_SERVER_KEY']}" %>
             <% elsif property.city %>
-              <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.city}&markers=color:red%7C#{property.city}&zoom=12&size=400x200&key=#{ENV['GOOGLE_API_SERVER_KEY']}" %>
+              <%= image_tag "https://maps.googleapis.com/maps/api/staticmap?center=#{property.address}&markers=color:red%7C#{property.address}&zoom=12&size=400x200&key=#{ENV['GOOGLE_API_SERVER_KEY']}" %>
             <% end %>
           <% end %>
         </div>
