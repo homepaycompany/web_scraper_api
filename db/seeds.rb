@@ -28,29 +28,34 @@
 #   end
 # end
 
-p '=============== Cleaning Properties ==============='
+# p '=============== Cleaning Properties ==============='
 
-Property.all.each do |property|
-  if property.city
-    match_data = property.city.match(/([^\d]+)(\d+)/)
-    if match_data
-      property.city = match_data[1].strip
-      property.zipcode = match_data[2]
-      p "#{property.id} - #{property.city} : #{property.zipcode}"
-      property.save
-    end
-  end
-end
+# Property.all.each do |property|
+#   if property.city
+#     match_data = property.city.match(/([^\d]+)(\d+)/)
+#     if match_data
+#       property.city = match_data[1].strip
+#       property.zipcode = match_data[2]
+#       p "#{property.id} - #{property.city} : #{property.zipcode}"
+#       property.save
+#     end
+#   end
+# end
 
 p '=============== Cleaning ALERTS ==============='
 
 Alert.all.each do |alert|
   if alert.city
-    match_data = alert.city.match(/(\d*)/)
+    match_data = alert.city.match(/([^\d]+)(\d*)/)
     if match_data
-      match_data[1].empty? ? alert.zipcode = nil : alert.zipcode = match_data[1]
-      p "#{alert.id} - #{alert.city} : #{alert.zipcode}"
-      alert.city = nil
+      if match_data[2].empty?
+        alert.city = match_data[1]  unless match_data[1].empty?
+        p "#{alert.id} - #{alert.city} : no zipcode"
+      else
+        alert.zipcode = match_data[2]
+        p "#{alert.id} - #{alert.city} : #{alert.zipcode}"
+        alert.city = nil
+      end
       alert.save
     end
   end
