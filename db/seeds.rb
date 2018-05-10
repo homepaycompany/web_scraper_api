@@ -46,7 +46,7 @@ p '=============== Cleaning ALERTS ==============='
 
 Alert.all.each do |alert|
   if alert.city
-    match_data = alert.city.match(/([^\d]+)(\d*)/)
+    match_data = alert.city.match(/([^\d]*)(\d*)/)
     if match_data
       if match_data[2].empty?
         alert.city = match_data[1]  unless match_data[1].empty?
