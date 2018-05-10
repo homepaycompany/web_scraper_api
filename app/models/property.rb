@@ -173,3 +173,7 @@ class Property < ApplicationRecord
     self.price_per_sqm = self.price / self.livable_size_sqm unless self.livable_size_sqm.nil? || self.livable_size_sqm == 0
   end
 end
+
+
+
+
