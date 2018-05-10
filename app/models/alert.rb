@@ -2,7 +2,7 @@ class Alert < ApplicationRecord
   belongs_to :user
   has_many :property_alerts, dependent: :destroy
   has_many :properties, through: :property_alerts
-  validates :city, :name, presence: true
+  validates :user, uniqueness: { scope: [:zipcode, :city] }
   # after_create :send_alert_email
 
   def properties_to_send
